@@ -412,6 +412,20 @@ enum class IrCmd : uint8_t
     // When undef is specified instead of a block, execution is aborted on check failure
     CHECK_NODE_VALUE,
 
+    // Guard against userdata tag mismatch
+    // A: pointer (Udata)
+    // B: int (tag)
+    // C: block/vmexit/undef
+    // When undef is specified instead of a block, execution is aborted on check failure
+    CHECK_UDATA_TAG,
+
+    // Guard against index overflowing the userdata length
+    // A: pointer (Udata)
+    // B: int (index)
+    // C: block/vmexit/undef
+    // When undef is specified instead of a block, execution is aborted on check failure
+    CHECK_UDATA_LEN,
+
     // Special operations
 
     // Check interrupt handler
@@ -609,6 +623,12 @@ enum class IrCmd : uint8_t
     // Find or create an upval at the given level
     // A: Rn (level)
     FINDUPVAL,
+
+    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // A: pointer (Udata)
+    // B: int (offset)
+    // C: int (value)
+    UDATA_WRITE8,
 };
 
 enum class IrConstKind : uint8_t

@@ -231,6 +231,10 @@ const char* getCmdName(IrCmd cmd)
         return "CHECK_NODE_NO_NEXT";
     case IrCmd::CHECK_NODE_VALUE:
         return "CHECK_NODE_VALUE";
+    case IrCmd::CHECK_UDATA_TAG:
+        return "CHECK_UDATA_TAG";
+    case IrCmd::CHECK_UDATA_LEN:
+        return "CHECK_UDATA_LEN";
     case IrCmd::INTERRUPT:
         return "INTERRUPT";
     case IrCmd::CHECK_GC:
@@ -313,6 +317,8 @@ const char* getCmdName(IrCmd cmd)
         return "GET_TYPEOF";
     case IrCmd::FINDUPVAL:
         return "FINDUPVAL";
+    case IrCmd::UDATA_WRITE8:
+        return "UDATA_WRITE8";
     }
 
     LUAU_UNREACHABLE();

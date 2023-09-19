@@ -127,6 +127,8 @@ inline bool isNonTerminatingJump(IrCmd cmd)
     case IrCmd::CHECK_SLOT_MATCH:
     case IrCmd::CHECK_NODE_NO_NEXT:
     case IrCmd::CHECK_NODE_VALUE:
+    case IrCmd::CHECK_UDATA_TAG:
+    case IrCmd::CHECK_UDATA_LEN:
         return true;
     default:
         break;

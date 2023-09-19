@@ -1343,7 +1343,7 @@ static int luauF_readi8(lua_State* L, StkId res, TValue* arg0, int nresults, Stk
 
 static int luauF_writei8(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 3 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
+    if(nparams >= 3 && nresults <= 0 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
     {
         void* buf = uvalue(arg0)->data;
         double n1 = nvalue(args);

@@ -1351,6 +1351,18 @@ void IrLoweringA64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         finalizeTargetLabel(inst.b, fresh);
         break;
     }
+    case IrCmd::CHECK_UDATA_TAG:
+    {
+        // TODO: find the time
+        error = true;
+        break;
+    }
+    case IrCmd::CHECK_UDATA_LEN:
+    {
+        // TODO: find the time
+        error = true;
+        break;
+    }
     case IrCmd::INTERRUPT:
     {
         regs.spill(build, index);
@@ -1969,6 +1981,11 @@ void IrLoweringA64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         inst.regA64 = regs.takeReg(x0, index);
         break;
     }
+
+    // TODO: find the time
+    case IrCmd::UDATA_WRITE8:
+        error = true;
+        break;
 
         // To handle unsupported instructions, add "case IrCmd::OP" and make sure to set error = true!
     }

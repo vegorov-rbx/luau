@@ -121,6 +121,7 @@ IrValueKind getCmdValueKind(IrCmd cmd)
     case IrCmd::CHECK_SLOT_MATCH:
     case IrCmd::CHECK_NODE_NO_NEXT:
     case IrCmd::CHECK_NODE_VALUE:
+    case IrCmd::CHECK_UDATA_TAG:
     case IrCmd::INTERRUPT:
     case IrCmd::CHECK_GC:
     case IrCmd::BARRIER_OBJ:

@@ -5,6 +5,7 @@
 #include "Luau/IrBuilder.h"
 
 #include "lstate.h"
+#include "ludata.h"
 
 #include <math.h>
 
@@ -812,6 +813,30 @@ static BuiltinImplResult translateBuiltinStringLen(IrBuilder& build, int nparams
     return {BuiltinImplType::Full, 1};
 }
 
+static BuiltinImplResult translateBuiltinBufWritei8(IrBuilder& build, int nparams, int ra, int arg, IrOp args, int nresults, int pcpos)
+{
+    if(nparams < 3 || nresults > 0)
+        return {BuiltinImplType::None, -1};
+
+    build.loadAndCheckTag(build.vmReg(arg), LUA_TUSERDATA, build.vmExit(pcpos));
+    builtinCheckDouble(build, args, pcpos);
+    builtinCheckDouble(build, build.vmReg(vmRegOp(args) + 1), pcpos);
+
+    IrOp buf = build.inst(IrCmd::LOAD_POINTER, build.vmReg(arg));
+    build.inst(IrCmd::CHECK_UDATA_TAG, buf, build.constInt(UTAG_BUF), build.vmExit(pcpos));
+
+    IrOp numIndex = builtinLoadDouble(build, args);
+    IrOp uintIndex = build.inst(IrCmd::TRY_NUM_TO_INDEX, numIndex, build.vmExit(pcpos));
+
+    IrOp uintIndexEnd = build.inst(IrCmd::ADD_INT, uintIndex, build.constInt(1));
+    build.inst(IrCmd::CHECK_UDATA_LEN, buf, uintIndexEnd, build.vmExit(pcpos));
+
+    IrOp numValue = builtinLoadDouble(build, build.vmReg(vmRegOp(args) + 1));
+    build.inst(IrCmd::UDATA_WRITE8, buf, uintIndex, build.inst(IrCmd::NUM_TO_INT, numValue));
+
+    return {BuiltinImplType::Full, 1};
+}
+
 BuiltinImplResult translateBuiltin(IrBuilder& build, int bfid, int ra, int arg, IrOp args, int nparams, int nresults, IrOp fallback, int pcpos)
 {
     // Builtins are not allowed to handle variadic arguments
@@ -900,6 +925,8 @@ BuiltinImplResult translateBuiltin(IrBuilder& build, int bfid, int ra, int arg, 
         return translateBuiltinTableInsert(build, nparams, ra, arg, args, nresults, pcpos);
     case LBF_STRING_LEN:
         return translateBuiltinStringLen(build, nparams, ra, arg, args, nresults, pcpos);
+    case LBF_BUF_WRITEI8:
+        return translateBuiltinBufWritei8(build, nparams, ra, arg, args, nresults, pcpos);
     default:
         return {BuiltinImplType::None, -1};
     }

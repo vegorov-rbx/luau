@@ -1130,6 +1130,20 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         jumpOrAbortOnUndef(ConditionX64::Equal, inst.b, next);
         break;
     }
+    case IrCmd::CHECK_UDATA_TAG:
+        build.cmp(byte[regOp(inst.a) + offsetof(Udata, tag)], int8_t(intOp(inst.b)));
+        jumpOrAbortOnUndef(ConditionX64::NotEqual, inst.c, next);
+        break;
+    case IrCmd::CHECK_UDATA_LEN:
+        if(inst.b.kind == IrOpKind::Inst)
+            build.cmp(dword[regOp(inst.a) + offsetof(Udata, len)], regOp(inst.b));
+        else if(inst.b.kind == IrOpKind::Constant)
+            build.cmp(dword[regOp(inst.a) + offsetof(Udata, len)], intOp(inst.b));
+        else
+            LUAU_ASSERT(!"Unsupported instruction form");
+
+        jumpOrAbortOnUndef(ConditionX64::BelowEqual, inst.c, next);
+        break;
     case IrCmd::INTERRUPT:
     {
         unsigned pcpos = uintOp(inst.a);
@@ -1594,6 +1608,17 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         callWrap.call(qword[rNativeContext + offsetof(NativeContext, luaF_findupval)]);
 
         inst.regX64 = regs.takeReg(rax, index);
+        break;
+    }
+
+    case IrCmd::UDATA_WRITE8:
+    {
+        OperandX64 value = inst.c.kind == IrOpKind::Inst ? regOp(inst.c) : OperandX64(intOp(inst.c));
+
+        if (inst.b.kind == IrOpKind::Inst)
+            build.mov(dword[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)], value);
+        else
+            build.mov(dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], value);
         break;
     }
 

@@ -844,6 +844,9 @@ static void constPropInInst(ConstPropState& state, IrBuilder& build, IrFunction&
             state.inSafeEnv = true;
         }
         break;
+    case IrCmd::CHECK_UDATA_TAG:
+        // TODO: track knowledge of userdata tags
+        break;
     case IrCmd::CHECK_GC:
         // It is enough to perform a GC check once in a block
         if (state.checkedGc)
