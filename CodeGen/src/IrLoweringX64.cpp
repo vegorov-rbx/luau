@@ -1611,14 +1611,25 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         break;
     }
 
-    case IrCmd::UDATA_WRITE8:
+    case IrCmd::UDATA_READI8:
+    {
+        inst.regX64 = regs.allocReg(SizeX64::dword, index);
+
+        if(inst.b.kind == IrOpKind::Inst)
+            build.movsx(inst.regX64, byte[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)]);
+        else
+            build.movsx(inst.regX64, byte[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)]);
+        break;
+    }
+
+    case IrCmd::UDATA_WRITEI8:
     {
         OperandX64 value = inst.c.kind == IrOpKind::Inst ? regOp(inst.c) : OperandX64(intOp(inst.c));
 
         if (inst.b.kind == IrOpKind::Inst)
-            build.mov(dword[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)], value);
+            build.mov(byte[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)], value);
         else
-            build.mov(dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], value);
+            build.mov(byte[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], value);
         break;
     }
 

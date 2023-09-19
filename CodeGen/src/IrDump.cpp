@@ -317,8 +317,10 @@ const char* getCmdName(IrCmd cmd)
         return "GET_TYPEOF";
     case IrCmd::FINDUPVAL:
         return "FINDUPVAL";
-    case IrCmd::UDATA_WRITE8:
-        return "UDATA_WRITE8";
+    case IrCmd::UDATA_READI8:
+        return "UDATA_READI8";
+    case IrCmd::UDATA_WRITEI8:
+        return "UDATA_WRITEI8";
     }
 
     LUAU_UNREACHABLE();
