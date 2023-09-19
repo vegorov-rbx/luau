@@ -23,6 +23,14 @@ declare bit32: {
     countrz: (n: number) -> number,
 }
 
+declare class ByteBuffer end
+
+declare buf: {
+    create: (number) -> ByteBuffer,
+    readi8: (ByteBuffer, number) -> number,
+    writei8: (ByteBuffer, number, number) -> (),
+}
+
 declare math: {
     frexp: (n: number) -> (number, number),
     ldexp: (s: number, e: number) -> number,

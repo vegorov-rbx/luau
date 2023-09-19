@@ -287,6 +287,11 @@ TEST_CASE("Basic")
     runConformance("basic.lua");
 }
 
+TEST_CASE("Buffers")
+{
+    runConformance("buffers.lua");
+}
+
 TEST_CASE("Math")
 {
     runConformance("math.lua");

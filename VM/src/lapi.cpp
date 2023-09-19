@@ -1249,7 +1249,7 @@ void lua_concat(lua_State* L, int n)
 
 void* lua_newuserdatatagged(lua_State* L, size_t sz, int tag)
 {
-    api_check(L, unsigned(tag) < LUA_UTAG_LIMIT || tag == UTAG_PROXY);
+    api_check(L, unsigned(tag) < LUA_UTAG_LIMIT || tag == UTAG_PROXY || tag == UTAG_BUF);
     luaC_checkGC(L);
     luaC_threadbarrier(L);
     Udata* u = luaU_newudata(L, sz, tag);
