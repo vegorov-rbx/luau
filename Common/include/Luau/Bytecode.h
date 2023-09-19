@@ -560,6 +560,10 @@ enum LuauBuiltinFunction
     // tonumber/tostring
     LBF_TONUMBER,
     LBF_TOSTRING,
+
+    // buf.
+    LBF_BUF_READI8,
+    LBF_BUF_WRITEI8,
 };
 
 // Capture type, used in LOP_CAPTURE

@@ -188,6 +188,14 @@ static int getBuiltinFunctionId(const Builtin& builtin, const CompileOptions& op
             return LBF_TABLE_UNPACK;
     }
 
+    if(builtin.object == "buf")
+    {
+        if(builtin.method == "readi8")
+            return LBF_BUF_READI8;
+        if(builtin.method == "writei8")
+            return LBF_BUF_WRITEI8;
+    }
+
     if (options.vectorCtor)
     {
         if (options.vectorLib)
@@ -402,6 +410,12 @@ BuiltinInfo getBuiltinInfo(int bfid)
 
     case LBF_TOSTRING:
         return {1, 1};
+
+    case LBF_BUF_READI8:
+        return {2, 1, BuiltinInfo::Flag_NoneSafe};
+
+    case LBF_BUF_WRITEI8:
+        return {3, 1, BuiltinInfo::Flag_NoneSafe};
     };
 
     LUAU_UNREACHABLE();

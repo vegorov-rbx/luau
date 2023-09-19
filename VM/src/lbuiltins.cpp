@@ -8,6 +8,7 @@
 #include "lgc.h"
 #include "lnumutils.h"
 #include "ldo.h"
+#include "ludata.h"
 
 #include <math.h>
 
@@ -1319,6 +1320,49 @@ static int luauF_tostring(lua_State* L, StkId res, TValue* arg0, int nresults, S
     return -1;
 }
 
+static int luauF_readi8(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
+    {
+        void* buf = uvalue(arg0)->data;
+
+        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned offset;
+        luai_num2unsigned(offset, nvalue(args)); // TODO: different semantics from int
+
+        if(uint64_t(offset) + 1 > uint64_t(len))
+            return -1;
+
+        int8_t val = ((int8_t*)buf)[offset];
+        setnvalue(res, double(val));
+        return 1;
+    }
+
+    return -1;
+}
+
+static int luauF_writei8(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if(nparams >= 3 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
+    {
+        void* buf = uvalue(arg0)->data;
+        double n1 = nvalue(args);
+        double n2 = nvalue(args + 1);
+
+        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned offset;
+        luai_num2unsigned(offset, n1);
+
+        if(uint64_t(offset) + 1 > uint64_t(len))
+            return -1;
+
+        ((int8_t*)buf)[offset] = int8_t(n2);
+        return 0;
+    }
+
+    return -1;
+}
+
 static int luauF_missing(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
     return -1;
@@ -1485,6 +1529,9 @@ const luau_FastFunction luauF_table[256] = {
 
     luauF_tonumber,
     luauF_tostring,
+
+    luauF_readi8,
+    luauF_writei8,
 
 // When adding builtins, add them above this line; what follows is 64 "dummy" entries with luauF_missing fallback.
 // This is important so that older versions of the runtime that don't support newer builtins automatically fall back via luauF_missing.

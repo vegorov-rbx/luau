@@ -480,6 +480,8 @@ static void handleBuiltinEffects(ConstPropState& state, LuauBuiltinFunction bfid
     case LBF_GETMETATABLE:
     case LBF_TONUMBER:
     case LBF_TOSTRING:
+    case LBF_BUF_READI8:
+    case LBF_BUF_WRITEI8:
         break;
     case LBF_TABLE_INSERT:
         state.invalidateHeap();
