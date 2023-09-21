@@ -29,6 +29,14 @@ declare buf: {
     create: (number) -> ByteBuffer,
     readi8: (ByteBuffer, number) -> number,
     writei8: (ByteBuffer, number, number) -> (),
+    readi16: (ByteBuffer, number) -> number,
+    writei16: (ByteBuffer, number, number) -> (),
+    readi32: (ByteBuffer, number) -> number,
+    writei32: (ByteBuffer, number, number) -> (),
+    readf32: (ByteBuffer, number) -> number,
+    writef32: (ByteBuffer, number, number) -> (),
+    readf64: (ByteBuffer, number) -> number,
+    writef64: (ByteBuffer, number, number) -> (),
 }
 
 declare math: {
