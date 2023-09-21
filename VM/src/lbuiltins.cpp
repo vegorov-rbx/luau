@@ -1351,7 +1351,7 @@ static int luauF_writei8(lua_State* L, StkId res, TValue* arg0, int nresults, St
 
         unsigned len = unsigned(uvalue(arg0)->len);
         unsigned offset;
-        luai_num2unsigned(offset, n1);
+        luai_num2unsigned(offset, n1); // TODO: different semantics from int
 
         if(uint64_t(offset) + 1 > uint64_t(len))
             return -1;

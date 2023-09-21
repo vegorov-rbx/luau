@@ -58,17 +58,169 @@ static int buf_writei8(lua_State* L)
     return 0;
 }
 
+static int buf_readi16(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    unsigned offset = luaL_checkunsigned(L, 2);
+
+    int16_t val;
+
+    if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        luaL_error(L, "attempt to read i16 from the buffer past the length of %u", len);
+
+    memcpy(&val, (char*)buf + offset, sizeof(val));
+    lua_pushnumber(L, double(val));
+    return 1;
+}
+
+static int buf_writei16(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    unsigned offset = luaL_checkunsigned(L, 2);
+    int value = luaL_checkinteger(L, 3);
+
+    int16_t val = int16_t(value);
+
+    if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        luaL_error(L, "attempt to write i16 from the buffer past the length of %u", len);
+
+    memcpy((char*)buf + offset, &val, sizeof(val));
+    return 0;
+}
+
+static int buf_readi32(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    unsigned offset = luaL_checkunsigned(L, 2);
+
+    int32_t val;
+
+    if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        luaL_error(L, "attempt to read i32 from the buffer past the length of %u", len);
+
+    memcpy(&val, (char*)buf + offset, sizeof(val));
+    lua_pushnumber(L, double(val));
+    return 1;
+}
+
+static int buf_writei32(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    unsigned offset = luaL_checkunsigned(L, 2);
+    int value = luaL_checkinteger(L, 3);
+
+    int32_t val = int32_t(value);
+
+    if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        luaL_error(L, "attempt to write i32 from the buffer past the length of %u", len);
+
+    memcpy((char*)buf + offset, &val, sizeof(val));
+    return 0;
+}
+
+static int buf_readf32(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    unsigned offset = luaL_checkunsigned(L, 2);
+
+    float val;
+
+    if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        luaL_error(L, "attempt to read f32 from the buffer past the length of %u", len);
+
+    memcpy(&val, (char*)buf + offset, sizeof(val));
+    lua_pushnumber(L, double(val));
+    return 1;
+}
+
+static int buf_writef32(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    unsigned offset = luaL_checkunsigned(L, 2);
+    double value = luaL_checknumber(L, 3);
+
+    float val = float(value);
+
+    if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        luaL_error(L, "attempt to write f32 from the buffer past the length of %u", len);
+
+    memcpy((char*)buf + offset, &val, sizeof(val));
+    return 0;
+}
+
+static int buf_readf64(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    unsigned offset = luaL_checkunsigned(L, 2);
+
+    double val;
+
+    if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        luaL_error(L, "attempt to read f64 from the buffer past the length of %u", len);
+
+    memcpy(&val, (char*)buf + offset, sizeof(val));
+    lua_pushnumber(L, double(val));
+    return 1;
+}
+
+static int buf_writef64(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    unsigned offset = luaL_checkunsigned(L, 2);
+    double val = luaL_checknumber(L, 3);
+
+    if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        luaL_error(L, "attempt to write f64 from the buffer past the length of %u", len);
+
+    memcpy((char*)buf + offset, &val, sizeof(val));
+    return 0;
+}
+
 static const luaL_Reg buflib[] = {
     {"create", buf_create},
     {"readi8", buf_readi8},
     {"writei8", buf_writei8},
-    /*{"readu8", buf_create},
-    {"readi16", buf_create},
-    {"readu16", buf_create},
-    {"readi32", buf_create},
-    {"readu32", buf_create},
-    {"readf32", buf_create},
-    {"readf64", buf_create},*/
+    {"readi16", buf_readi16},
+    {"writei16", buf_writei16},
+    {"readi32", buf_readi32},
+    {"writei32", buf_writei32},
+    {"readf32", buf_readf32},
+    {"writef32", buf_writef32},
+    {"readf64", buf_readf64},
+    {"writef64", buf_writef64},
+    // TODO: unsigned integers
     {NULL, NULL},
 };
 
