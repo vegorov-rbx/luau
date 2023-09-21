@@ -11,6 +11,7 @@
 #include "ludata.h"
 
 #include <math.h>
+#include <string.h>
 
 #ifdef _MSC_VER
 #include <intrin.h>
@@ -1363,6 +1364,147 @@ static int luauF_writei8(lua_State* L, StkId res, TValue* arg0, int nresults, St
     return -1;
 }
 
+static int luauF_readi32(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
+    {
+        void* buf = uvalue(arg0)->data;
+
+        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned offset;
+        luai_num2unsigned(offset, nvalue(args)); // TODO: different semantics from int
+
+        int32_t val;
+
+        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+            return -1;
+
+        memcpy(&val, (char*)buf + offset, sizeof(val));
+        setnvalue(res, double(val));
+        return 1;
+    }
+
+    return -1;
+}
+
+static int luauF_writei32(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if(nparams >= 3 && nresults <= 0 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
+    {
+        void* buf = uvalue(arg0)->data;
+        double n1 = nvalue(args);
+        double n2 = nvalue(args + 1);
+
+        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned offset;
+        luai_num2unsigned(offset, n1); // TODO: different semantics from int
+
+        int32_t val = int32_t(n2);
+
+        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+            return -1;
+
+        memcpy((char*)buf + offset, &val, sizeof(val));
+        return 0;
+    }
+
+    return -1;
+}
+
+static int luauF_readf32(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
+    {
+        void* buf = uvalue(arg0)->data;
+
+        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned offset;
+        luai_num2unsigned(offset, nvalue(args)); // TODO: different semantics from int
+
+        float val;
+
+        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+            return -1;
+
+        memcpy(&val, (char*)buf + offset, sizeof(val));
+        setnvalue(res, double(val));
+        return 1;
+    }
+
+    return -1;
+}
+
+static int luauF_writef32(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if(nparams >= 3 && nresults <= 0 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
+    {
+        void* buf = uvalue(arg0)->data;
+        double n1 = nvalue(args);
+        double n2 = nvalue(args + 1);
+
+        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned offset;
+        luai_num2unsigned(offset, n1); // TODO: different semantics from int
+
+        float val = float(n2);
+
+        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+            return -1;
+
+        memcpy((char*)buf + offset, &val, sizeof(val));
+        return 0;
+    }
+
+    return -1;
+}
+
+static int luauF_readf64(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
+    {
+        void* buf = uvalue(arg0)->data;
+
+        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned offset;
+        luai_num2unsigned(offset, nvalue(args)); // TODO: different semantics from int
+
+        double val;
+
+        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+            return -1;
+
+        memcpy(&val, (char*)buf + offset, sizeof(val));
+        setnvalue(res, double(val));
+        return 1;
+    }
+
+    return -1;
+}
+
+static int luauF_writef64(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if(nparams >= 3 && nresults <= 0 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
+    {
+        void* buf = uvalue(arg0)->data;
+        double n1 = nvalue(args);
+        double n2 = nvalue(args + 1);
+
+        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned offset;
+        luai_num2unsigned(offset, n1); // TODO: different semantics from int
+
+        double val = n2;
+
+        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+            return -1;
+
+        memcpy((char*)buf + offset, &val, sizeof(val));
+        return 0;
+    }
+
+    return -1;
+}
+
 static int luauF_missing(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
     return -1;
@@ -1532,6 +1674,12 @@ const luau_FastFunction luauF_table[256] = {
 
     luauF_readi8,
     luauF_writei8,
+    luauF_readi32,
+    luauF_writei32,
+    luauF_readf32,
+    luauF_writef32,
+    luauF_readf64,
+    luauF_writef64,
 
 // When adding builtins, add them above this line; what follows is 64 "dummy" entries with luauF_missing fallback.
 // This is important so that older versions of the runtime that don't support newer builtins automatically fall back via luauF_missing.

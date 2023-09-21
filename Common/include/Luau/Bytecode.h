@@ -564,6 +564,12 @@ enum LuauBuiltinFunction
     // buf.
     LBF_BUF_READI8,
     LBF_BUF_WRITEI8,
+    LBF_BUF_READI32,
+    LBF_BUF_WRITEI32,
+    LBF_BUF_READF32,
+    LBF_BUF_WRITEF32,
+    LBF_BUF_READF64,
+    LBF_BUF_WRITEF64,
 };
 
 // Capture type, used in LOP_CAPTURE
