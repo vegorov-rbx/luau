@@ -37,6 +37,8 @@ struct RegisterInfo
     bool knownNotReadonly = false;
     bool knownNoMetatable = false;
     int knownTableArraySize = -1;
+    int knownUdataTag = -1;
+    int knownUdataLen = -1;
 };
 
 // Load instructions are linked to target register to carry knowledge about the target
@@ -102,6 +104,8 @@ struct ConstPropState
                 info->knownNotReadonly = false;
                 info->knownNoMetatable = false;
                 info->knownTableArraySize = -1;
+                info->knownUdataTag = -1;
+                info->knownUdataLen = -1;
                 info->version++;
             }
         }
@@ -120,6 +124,8 @@ struct ConstPropState
             reg.knownNotReadonly = false;
             reg.knownNoMetatable = false;
             reg.knownTableArraySize = -1;
+            reg.knownUdataTag = -1;
+            reg.knownUdataLen = -1;
         }
 
         reg.version++;
@@ -189,6 +195,8 @@ struct ConstPropState
         reg.knownNotReadonly = false;
         reg.knownNoMetatable = false;
         reg.knownTableArraySize = -1;
+        reg.knownUdataTag = -1;
+        reg.knownUdataLen = -1;
     }
 
     void invalidateUserCall()
@@ -845,7 +853,42 @@ static void constPropInInst(ConstPropState& state, IrBuilder& build, IrFunction&
         }
         break;
     case IrCmd::CHECK_UDATA_TAG:
-        // TODO: track knowledge of userdata tags
+        if(RegisterInfo* info = state.tryGetRegisterInfo(inst.a))
+        {
+            if(info->knownUdataTag == function.intOp(inst.b))
+            {
+                if(FFlag::DebugLuauAbortingChecks)
+                    replace(function, inst.b, build.undef());
+                else
+                    kill(function, inst);
+            }
+            else
+            {
+                info->knownUdataTag = function.intOp(inst.b);
+            }
+        }
+        break;
+    case IrCmd::CHECK_UDATA_LEN:
+        if(RegisterInfo* info = state.tryGetRegisterInfo(inst.a))
+        {
+            int index = function.intOp(inst.b); // TODO: overflows are possible!
+
+            if(info->knownUdataLen > index)
+            {
+                if(FFlag::DebugLuauAbortingChecks)
+                    replace(function, inst.b, build.undef());
+                else
+                    kill(function, inst);
+            }
+            else
+            {
+                info->knownUdataLen = index;
+            }
+        }
+        // TODO: track knowledge of userdata length
+        break;
+    case IrCmd::UDATA_READI8:
+    case IrCmd::UDATA_WRITEI8:
         break;
     case IrCmd::CHECK_GC:
         // It is enough to perform a GC check once in a block
@@ -1121,6 +1164,9 @@ static void constPropInInst(ConstPropState& state, IrBuilder& build, IrFunction&
         state.invalidate(IrOp{inst.b.kind, vmRegOp(inst.b) + 0u});
         state.invalidate(IrOp{inst.b.kind, vmRegOp(inst.b) + 1u});
         state.invalidate(IrOp{inst.b.kind, vmRegOp(inst.b) + 2u});
+        break;
+    default:
+        LUAU_ASSERT(!"unhandled case");
         break;
     }
 }
