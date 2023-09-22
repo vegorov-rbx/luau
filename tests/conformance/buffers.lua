@@ -48,10 +48,9 @@ local function simple_double_reinterpret()
 
     buf.writef64(b, 10, 1.437576533064206)
     local magic1 = buf.readi32(b, 10)
-    assert(magic1 == 0x40302010)
-
-    buf.writef32(b, 10, 2.75197)
     local magic2 = buf.readi32(b, 14)
+
+    assert(magic1 == 0x40302010)
     assert(magic2 == 0x3ff70050)
 end
 

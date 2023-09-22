@@ -753,9 +753,9 @@ void AssemblyBuilderX64::vcvtss2sd(OperandX64 dst, OperandX64 src1, OperandX64 s
     if(src2.cat == CategoryX64::reg)
         LUAU_ASSERT(src2.base.size == SizeX64::xmmword);
     else
-        LUAU_ASSERT(src2.memSize == SizeX64::qword);
+        LUAU_ASSERT(src2.memSize == SizeX64::dword);
 
-    placeAvx("vcvtsd2ss", dst, src1, src2, 0x5a, (src2.cat == CategoryX64::reg ? src2.base.size : src2.memSize) == SizeX64::qword, AVX_0F, AVX_F3);
+    placeAvx("vcvtsd2ss", dst, src1, src2, 0x5a, false, AVX_0F, AVX_F3);
 }
 
 void AssemblyBuilderX64::vroundsd(OperandX64 dst, OperandX64 src1, OperandX64 src2, RoundingModeX64 roundingMode)

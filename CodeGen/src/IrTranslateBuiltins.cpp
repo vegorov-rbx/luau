@@ -813,22 +813,31 @@ static BuiltinImplResult translateBuiltinStringLen(IrBuilder& build, int nparams
     return {BuiltinImplType::Full, 1};
 }
 
+static void translateBufArgsAndCheckBounds(IrBuilder& build, int nparams, int arg, IrOp args, int size, int pcpos, IrOp& buf, IrOp& uintIndex)
+{
+    build.loadAndCheckTag(build.vmReg(arg), LUA_TUSERDATA, build.vmExit(pcpos));
+    builtinCheckDouble(build, args, pcpos);
+
+    if (nparams == 3)
+        builtinCheckDouble(build, build.vmReg(vmRegOp(args) + 1), pcpos);
+
+    buf = build.inst(IrCmd::LOAD_POINTER, build.vmReg(arg));
+    build.inst(IrCmd::CHECK_UDATA_TAG, buf, build.constInt(UTAG_BUF), build.vmExit(pcpos));
+
+    IrOp numIndex = builtinLoadDouble(build, args);
+    uintIndex = build.inst(IrCmd::TRY_NUM_TO_INDEX, numIndex, build.vmExit(pcpos));
+
+    IrOp uintIndexEnd = build.inst(IrCmd::ADD_INT, uintIndex, build.constInt(size));
+    build.inst(IrCmd::CHECK_UDATA_LEN, buf, uintIndexEnd, build.vmExit(pcpos));
+}
+
 static BuiltinImplResult translateBuiltinBufReadi8(IrBuilder& build, int nparams, int ra, int arg, IrOp args, int nresults, int pcpos)
 {
     if(nparams < 2 || nresults > 1)
         return {BuiltinImplType::None, -1};
 
-    build.loadAndCheckTag(build.vmReg(arg), LUA_TUSERDATA, build.vmExit(pcpos));
-    builtinCheckDouble(build, args, pcpos);
-
-    IrOp buf = build.inst(IrCmd::LOAD_POINTER, build.vmReg(arg));
-    build.inst(IrCmd::CHECK_UDATA_TAG, buf, build.constInt(UTAG_BUF), build.vmExit(pcpos));
-
-    IrOp numIndex = builtinLoadDouble(build, args);
-    IrOp uintIndex = build.inst(IrCmd::TRY_NUM_TO_INDEX, numIndex, build.vmExit(pcpos));
-
-    IrOp uintIndexEnd = build.inst(IrCmd::ADD_INT, uintIndex, build.constInt(1));
-    build.inst(IrCmd::CHECK_UDATA_LEN, buf, uintIndexEnd, build.vmExit(pcpos));
+    IrOp buf, uintIndex;
+    translateBufArgsAndCheckBounds(build, nparams, arg, args, 1, pcpos, buf, uintIndex);
 
     IrOp result = build.inst(IrCmd::UDATA_READI8, buf, uintIndex);
     build.inst(IrCmd::STORE_DOUBLE, build.vmReg(ra), build.inst(IrCmd::INT_TO_NUM, result));
@@ -842,21 +851,98 @@ static BuiltinImplResult translateBuiltinBufWritei8(IrBuilder& build, int nparam
     if(nparams < 3 || nresults > 0)
         return {BuiltinImplType::None, -1};
 
-    build.loadAndCheckTag(build.vmReg(arg), LUA_TUSERDATA, build.vmExit(pcpos));
-    builtinCheckDouble(build, args, pcpos);
-    builtinCheckDouble(build, build.vmReg(vmRegOp(args) + 1), pcpos);
-
-    IrOp buf = build.inst(IrCmd::LOAD_POINTER, build.vmReg(arg));
-    build.inst(IrCmd::CHECK_UDATA_TAG, buf, build.constInt(UTAG_BUF), build.vmExit(pcpos));
-
-    IrOp numIndex = builtinLoadDouble(build, args);
-    IrOp uintIndex = build.inst(IrCmd::TRY_NUM_TO_INDEX, numIndex, build.vmExit(pcpos));
-
-    IrOp uintIndexEnd = build.inst(IrCmd::ADD_INT, uintIndex, build.constInt(1));
-    build.inst(IrCmd::CHECK_UDATA_LEN, buf, uintIndexEnd, build.vmExit(pcpos));
+    IrOp buf, uintIndex;
+    translateBufArgsAndCheckBounds(build, nparams, arg, args, 1, pcpos, buf, uintIndex);
 
     IrOp numValue = builtinLoadDouble(build, build.vmReg(vmRegOp(args) + 1));
     build.inst(IrCmd::UDATA_WRITEI8, buf, uintIndex, build.inst(IrCmd::NUM_TO_INT, numValue));
+
+    return {BuiltinImplType::Full, 1};
+}
+
+static BuiltinImplResult translateBuiltinBufReadi32(IrBuilder& build, int nparams, int ra, int arg, IrOp args, int nresults, int pcpos)
+{
+    if(nparams < 2 || nresults > 1)
+        return {BuiltinImplType::None, -1};
+
+    IrOp buf, uintIndex;
+    translateBufArgsAndCheckBounds(build, nparams, arg, args, 4, pcpos, buf, uintIndex);
+
+    IrOp result = build.inst(IrCmd::UDATA_READI32, buf, uintIndex);
+    build.inst(IrCmd::STORE_DOUBLE, build.vmReg(ra), build.inst(IrCmd::INT_TO_NUM, result));
+    build.inst(IrCmd::STORE_TAG, build.vmReg(ra), build.constTag(LUA_TNUMBER));
+
+    return {BuiltinImplType::Full, 1};
+}
+
+static BuiltinImplResult translateBuiltinBufWritei32(IrBuilder& build, int nparams, int ra, int arg, IrOp args, int nresults, int pcpos)
+{
+    if(nparams < 3 || nresults > 0)
+        return {BuiltinImplType::None, -1};
+
+    IrOp buf, uintIndex;
+    translateBufArgsAndCheckBounds(build, nparams, arg, args, 4, pcpos, buf, uintIndex);
+
+    IrOp numValue = builtinLoadDouble(build, build.vmReg(vmRegOp(args) + 1));
+    build.inst(IrCmd::UDATA_WRITEI32, buf, uintIndex, build.inst(IrCmd::NUM_TO_INT, numValue));
+
+    return {BuiltinImplType::Full, 1};
+}
+
+static BuiltinImplResult translateBuiltinBufReadf32(IrBuilder& build, int nparams, int ra, int arg, IrOp args, int nresults, int pcpos)
+{
+    if(nparams < 2 || nresults > 1)
+        return {BuiltinImplType::None, -1};
+
+    IrOp buf, uintIndex;
+    translateBufArgsAndCheckBounds(build, nparams, arg, args, 4, pcpos, buf, uintIndex);
+
+    IrOp result = build.inst(IrCmd::UDATA_READF32, buf, uintIndex);
+    build.inst(IrCmd::STORE_DOUBLE, build.vmReg(ra), result);
+    build.inst(IrCmd::STORE_TAG, build.vmReg(ra), build.constTag(LUA_TNUMBER));
+
+    return {BuiltinImplType::Full, 1};
+}
+
+static BuiltinImplResult translateBuiltinBufWritef32(IrBuilder& build, int nparams, int ra, int arg, IrOp args, int nresults, int pcpos)
+{
+    if(nparams < 3 || nresults > 0)
+        return { BuiltinImplType::None, -1 };
+
+    IrOp buf, uintIndex;
+    translateBufArgsAndCheckBounds(build, nparams, arg, args, 4, pcpos, buf, uintIndex);
+
+    IrOp numValue = builtinLoadDouble(build, build.vmReg(vmRegOp(args) + 1));
+    build.inst(IrCmd::UDATA_WRITEF32, buf, uintIndex, numValue);
+
+    return {BuiltinImplType::Full, 1};
+}
+
+static BuiltinImplResult translateBuiltinBufReadf64(IrBuilder& build, int nparams, int ra, int arg, IrOp args, int nresults, int pcpos)
+{
+    if(nparams < 2 || nresults > 1)
+        return {BuiltinImplType::None, -1};
+
+    IrOp buf, uintIndex;
+    translateBufArgsAndCheckBounds(build, nparams, arg, args, 8, pcpos, buf, uintIndex);
+
+    IrOp result = build.inst(IrCmd::UDATA_READF64, buf, uintIndex);
+    build.inst(IrCmd::STORE_DOUBLE, build.vmReg(ra), result);
+    build.inst(IrCmd::STORE_TAG, build.vmReg(ra), build.constTag(LUA_TNUMBER));
+
+    return {BuiltinImplType::Full, 1};
+}
+
+static BuiltinImplResult translateBuiltinBufWritef64(IrBuilder& build, int nparams, int ra, int arg, IrOp args, int nresults, int pcpos)
+{
+    if(nparams < 3 || nresults > 0)
+        return {BuiltinImplType::None, -1};
+
+    IrOp buf, uintIndex;
+    translateBufArgsAndCheckBounds(build, nparams, arg, args, 8, pcpos, buf, uintIndex);
+
+    IrOp numValue = builtinLoadDouble(build, build.vmReg(vmRegOp(args) + 1));
+    build.inst(IrCmd::UDATA_WRITEF64, buf, uintIndex, numValue);
 
     return {BuiltinImplType::Full, 1};
 }
@@ -953,6 +1039,18 @@ BuiltinImplResult translateBuiltin(IrBuilder& build, int bfid, int ra, int arg, 
         return translateBuiltinBufReadi8(build, nparams, ra, arg, args, nresults, pcpos);
     case LBF_BUF_WRITEI8:
         return translateBuiltinBufWritei8(build, nparams, ra, arg, args, nresults, pcpos);
+    case LBF_BUF_READI32:
+        return translateBuiltinBufReadi32(build, nparams, ra, arg, args, nresults, pcpos);
+    case LBF_BUF_WRITEI32:
+        return translateBuiltinBufWritei32(build, nparams, ra, arg, args, nresults, pcpos);
+    case LBF_BUF_READF32:
+        return translateBuiltinBufReadf32(build, nparams, ra, arg, args, nresults, pcpos);
+    case LBF_BUF_WRITEF32:
+        return translateBuiltinBufWritef32(build, nparams, ra, arg, args, nresults, pcpos);
+    case LBF_BUF_READF64:
+        return translateBuiltinBufReadf64(build, nparams, ra, arg, args, nresults, pcpos);
+    case LBF_BUF_WRITEF64:
+        return translateBuiltinBufWritef64(build, nparams, ra, arg, args, nresults, pcpos);
     default:
         return {BuiltinImplType::None, -1};
     }
