@@ -635,6 +635,42 @@ enum class IrCmd : uint8_t
     // B: int (offset)
     // C: int (value)
     UDATA_WRITEI8,
+
+    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // A: pointer (Udata)
+    // B: int (offset)
+    // C: int (value)
+    UDATA_READI32,
+
+    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // A: pointer (Udata)
+    // B: int (offset)
+    // C: int (value)
+    UDATA_WRITEI32,
+
+    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // A: pointer (Udata)
+    // B: int (offset)
+    // C: int (value)
+    UDATA_READF32,
+
+    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // A: pointer (Udata)
+    // B: int (offset)
+    // C: int (value)
+    UDATA_WRITEF32,
+
+    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // A: pointer (Udata)
+    // B: int (offset)
+    // C: int (value)
+    UDATA_READF64,
+
+    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // A: pointer (Udata)
+    // B: int (offset)
+    // C: int (value)
+    UDATA_WRITEF64,
 };
 
 enum class IrConstKind : uint8_t

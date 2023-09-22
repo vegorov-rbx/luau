@@ -490,6 +490,12 @@ static void handleBuiltinEffects(ConstPropState& state, LuauBuiltinFunction bfid
     case LBF_TOSTRING:
     case LBF_BUF_READI8:
     case LBF_BUF_WRITEI8:
+    case LBF_BUF_READI32:
+    case LBF_BUF_WRITEI32:
+    case LBF_BUF_READF32:
+    case LBF_BUF_WRITEF32:
+    case LBF_BUF_READF64:
+    case LBF_BUF_WRITEF64:
         break;
     case LBF_TABLE_INSERT:
         state.invalidateHeap();
@@ -889,6 +895,12 @@ static void constPropInInst(ConstPropState& state, IrBuilder& build, IrFunction&
         break;
     case IrCmd::UDATA_READI8:
     case IrCmd::UDATA_WRITEI8:
+    case IrCmd::UDATA_READI32:
+    case IrCmd::UDATA_WRITEI32:
+    case IrCmd::UDATA_READF32:
+    case IrCmd::UDATA_WRITEF32:
+    case IrCmd::UDATA_READF64:
+    case IrCmd::UDATA_WRITEF64:
         break;
     case IrCmd::CHECK_GC:
         // It is enough to perform a GC check once in a block

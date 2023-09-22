@@ -198,6 +198,10 @@ inline bool hasResult(IrCmd cmd)
     case IrCmd::GET_TYPEOF:
     case IrCmd::NEWCLOSURE:
     case IrCmd::FINDUPVAL:
+    case IrCmd::UDATA_READI8:
+    case IrCmd::UDATA_READI32:
+    case IrCmd::UDATA_READF32:
+    case IrCmd::UDATA_READF64:
         return true;
     default:
         break;

@@ -321,6 +321,18 @@ const char* getCmdName(IrCmd cmd)
         return "UDATA_READI8";
     case IrCmd::UDATA_WRITEI8:
         return "UDATA_WRITEI8";
+    case IrCmd::UDATA_READI32:
+        return "UDATA_READI32";
+    case IrCmd::UDATA_WRITEI32:
+        return "UDATA_WRITEI32";
+    case IrCmd::UDATA_READF32:
+        return "UDATA_READF32";
+    case IrCmd::UDATA_WRITEF32:
+        return "UDATA_WRITEF32";
+    case IrCmd::UDATA_READF64:
+        return "UDATA_READF64";
+    case IrCmd::UDATA_WRITEF64:
+        return "UDATA_WRITEF64";
     }
 
     LUAU_UNREACHABLE();
