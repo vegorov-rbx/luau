@@ -194,6 +194,18 @@ static int getBuiltinFunctionId(const Builtin& builtin, const CompileOptions& op
             return LBF_BUF_READI8;
         if(builtin.method == "writei8")
             return LBF_BUF_WRITEI8;
+        if(builtin.method == "readi32")
+            return LBF_BUF_READI32;
+        if(builtin.method == "writei32")
+            return LBF_BUF_WRITEI32;
+        if(builtin.method == "readf32")
+            return LBF_BUF_READF32;
+        if(builtin.method == "writef32")
+            return LBF_BUF_WRITEF32;
+        if(builtin.method == "readf64")
+            return LBF_BUF_READF64;
+        if(builtin.method == "writef64")
+            return LBF_BUF_WRITEF64;
     }
 
     if (options.vectorCtor)
@@ -415,6 +427,24 @@ BuiltinInfo getBuiltinInfo(int bfid)
         return {2, 1, BuiltinInfo::Flag_NoneSafe};
 
     case LBF_BUF_WRITEI8:
+        return {3, 1, BuiltinInfo::Flag_NoneSafe};
+
+    case LBF_BUF_READI32:
+        return {2, 1, BuiltinInfo::Flag_NoneSafe};
+
+    case LBF_BUF_WRITEI32:
+        return {3, 1, BuiltinInfo::Flag_NoneSafe};
+
+    case LBF_BUF_READF32:
+        return {2, 1, BuiltinInfo::Flag_NoneSafe};
+
+    case LBF_BUF_WRITEF32:
+        return {3, 1, BuiltinInfo::Flag_NoneSafe};
+
+    case LBF_BUF_READF64:
+        return {2, 1, BuiltinInfo::Flag_NoneSafe};
+
+    case LBF_BUF_WRITEF64:
         return {3, 1, BuiltinInfo::Flag_NoneSafe};
     };
 

@@ -30,6 +30,10 @@ local function simple_float_reinterpret()
     buf.writei32(b, 10, 0x3f800000)
     local one = buf.readf32(b, 10)
     assert(one == 1.0)
+
+    buf.writef32(b, 10, 2.75197)
+    local magic = buf.readi32(b, 10)
+    assert(magic == 0x40302047)
 end
 
 simple_float_reinterpret()
@@ -41,6 +45,14 @@ local function simple_double_reinterpret()
     buf.writei32(b, 14, 0x3ff00000)
     local one = buf.readf64(b, 10)
     assert(one == 1.0)
+
+    buf.writef64(b, 10, 1.437576533064206)
+    local magic1 = buf.readi32(b, 10)
+    assert(magic1 == 0x40302010)
+
+    buf.writef32(b, 10, 2.75197)
+    local magic2 = buf.readi32(b, 14)
+    assert(magic2 == 0x3ff70050)
 end
 
 simple_double_reinterpret()
