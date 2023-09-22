@@ -56,4 +56,18 @@ end
 
 simple_double_reinterpret()
 
+local function simple_string_ops()
+    local b = buf.create(1024)
+
+    buf.writestring(b, 15, " world")
+    buf.writestring(b, 10, "hello")
+    buf.writei8(b, 21, string.byte('!'))
+
+    local str = buf.readstring(b, 10, 12)
+
+    assert(str == "hello world!")
+end
+
+simple_string_ops()
+
 return('OK')

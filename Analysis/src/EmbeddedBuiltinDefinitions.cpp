@@ -37,6 +37,8 @@ declare buf: {
     writef32: (ByteBuffer, number, number) -> (),
     readf64: (ByteBuffer, number) -> number,
     writef64: (ByteBuffer, number, number) -> (),
+    readstring: (ByteBuffer, number, number) -> string,
+    writestring: (ByteBuffer, number, string) -> (),
 }
 
 declare math: {

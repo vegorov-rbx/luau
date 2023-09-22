@@ -208,6 +208,41 @@ static int buf_writef64(lua_State* L)
     return 0;
 }
 
+static int buf_readstring(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    unsigned offset = luaL_checkunsigned(L, 2);
+    unsigned size = luaL_checkunsigned(L, 3);
+
+    if(uint64_t(offset) + size > uint64_t(len))
+        luaL_error(L, "attempt to read string from the buffer past the length of %u", len);
+
+    lua_pushlstring(L, (char*)buf + offset, size);
+    return 1;
+}
+
+static int buf_writestring(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    unsigned offset = luaL_checkunsigned(L, 2);
+    size_t stringlen = 0;
+    const char* val = luaL_checklstring(L, 3, &stringlen);
+
+    if(uint64_t(offset) + stringlen > uint64_t(len))
+        luaL_error(L, "attempt to write string from the buffer past the length of %u", len);
+
+    memcpy((char*)buf + offset, val, stringlen);
+    return 0;
+}
+
 static const luaL_Reg buflib[] = {
     {"create", buf_create},
     {"readi8", buf_readi8},
@@ -220,6 +255,8 @@ static const luaL_Reg buflib[] = {
     {"writef32", buf_writef32},
     {"readf64", buf_readf64},
     {"writef64", buf_writef64},
+    {"readstring", buf_readstring},
+    {"writestring", buf_writestring},
     // TODO: unsigned integers
     {NULL, NULL},
 };
