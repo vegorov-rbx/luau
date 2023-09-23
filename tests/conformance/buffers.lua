@@ -24,6 +24,29 @@ end
 
 simple_byte_reads()
 
+local function offset_byte_reads(start: number)
+    local b = buf.create(1024)
+
+    buf.writei8(b, start, 32)
+    assert(buf.readi8(b, start) == 32)
+    buf.writei8(b, start + 5, 5)
+    buf.writei8(b, start + 4, 4)
+    buf.writei8(b, start + 3, 3)
+    buf.writei8(b, start + 2, 2)
+    buf.writei8(b, start + 1, 1)
+    assert(buf.readi8(b, start + 1) == 1)
+    assert(buf.readi8(b, start + 2) == 2)
+    assert(buf.readi8(b, start + 3) == 3)
+    assert(buf.readi8(b, start + 4) == 4)
+    assert(buf.readi8(b, start + 5) == 5)
+
+    local x = buf.readi8(b, start + 4) + buf.readi8(b, start + 3)
+    assert(x == 7)
+end
+
+offset_byte_reads(5)
+offset_byte_reads(30)
+
 local function simple_float_reinterpret()
     local b = buf.create(1024)
 

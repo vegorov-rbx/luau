@@ -877,20 +877,22 @@ static void constPropInInst(ConstPropState& state, IrBuilder& build, IrFunction&
     case IrCmd::CHECK_UDATA_LEN:
         if(RegisterInfo* info = state.tryGetRegisterInfo(inst.a))
         {
-            int index = function.intOp(inst.b); // TODO: overflows are possible!
-
-            if(info->knownUdataLen > index)
+            if(std::optional<int> index = function.asIntOp(inst.b))
             {
-                if(FFlag::DebugLuauAbortingChecks)
-                    replace(function, inst.b, build.undef());
+                if(info->knownUdataLen > *index)
+                {
+                    if(FFlag::DebugLuauAbortingChecks)
+                        replace(function, inst.b, build.undef());
+                    else
+                        kill(function, inst);
+                }
                 else
-                    kill(function, inst);
-            }
-            else
-            {
-                info->knownUdataLen = index;
+                {
+                    info->knownUdataLen = *index;
+                }
             }
         }
+
         // TODO: track knowledge of userdata length
         break;
     case IrCmd::UDATA_READI8:

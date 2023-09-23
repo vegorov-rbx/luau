@@ -752,7 +752,19 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
 
         ScopedRegX64 tmp{regs, SizeX64::xmmword};
 
-        convertNumberToIndexOrJump(build, tmp.reg, regOp(inst.a), inst.regX64, labelOp(inst.b));
+        LUAU_ASSERT(inst.regX64.size == SizeX64::dword);
+
+        // Convert to integer, NaN is converted into 0x80000000
+        build.vcvttsd2si(inst.regX64, regOp(inst.a));
+
+        // Convert that integer back to double
+        build.vcvtsi2sd(tmp.reg, regOp(inst.a), inst.regX64);
+
+        build.vucomisd(tmp.reg, regOp(inst.a)); // Sets ZF=1 if equal or NaN
+
+        // We don't need non-integer values
+        // But to skip the PF=1 check, we proceed with NaN because 0x80000000 index is out of bounds
+        jumpOrAbortOnUndef(ConditionX64::NotZero, inst.b, next);
         break;
     }
     case IrCmd::TRY_CALL_FASTGETTM:
@@ -1616,7 +1628,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         inst.regX64 = regs.allocReg(SizeX64::dword, index);
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.movsx(inst.regX64, byte[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)]);
+            build.movsx(inst.regX64, byte[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)]);
         else
             build.movsx(inst.regX64, byte[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)]);
         break;
@@ -1627,7 +1639,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         OperandX64 value = inst.c.kind == IrOpKind::Inst ? regOp(inst.c) : OperandX64(intOp(inst.c));
 
         if (inst.b.kind == IrOpKind::Inst)
-            build.mov(byte[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)], value);
+            build.mov(byte[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)], value);
         else
             build.mov(byte[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], value);
         break;
@@ -1638,7 +1650,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         inst.regX64 = regs.allocReg(SizeX64::dword, index);
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.mov(inst.regX64, dword[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)]);
+            build.mov(inst.regX64, dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)]);
         else
             build.mov(inst.regX64, dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)]);
         break;
@@ -1649,7 +1661,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         OperandX64 value = inst.c.kind == IrOpKind::Inst ? regOp(inst.c) : OperandX64(intOp(inst.c));
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.mov(dword[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)], value);
+            build.mov(dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)], value);
         else
             build.mov(dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], value);
         break;
@@ -1660,7 +1672,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         inst.regX64 = regs.allocReg(SizeX64::xmmword, index);
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.vcvtss2sd(inst.regX64, inst.regX64, dword[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)]);
+            build.vcvtss2sd(inst.regX64, inst.regX64, dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)]);
         else
             build.vcvtss2sd(inst.regX64, inst.regX64, dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)]);
         break;
@@ -1669,7 +1681,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
     case IrCmd::UDATA_WRITEF32:
     {
         if(inst.b.kind == IrOpKind::Inst)
-            storeDoubleAsFloat(dword[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)], inst.c);
+            storeDoubleAsFloat(dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)], inst.c);
         else
             storeDoubleAsFloat(dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], inst.c);
         break;
@@ -1680,7 +1692,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         inst.regX64 = regs.allocReg(SizeX64::xmmword, index);
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.vmovsd(inst.regX64, qword[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)]);
+            build.vmovsd(inst.regX64, qword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)]);
         else
             build.vmovsd(inst.regX64, qword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)]);
         break;
@@ -1689,7 +1701,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
     case IrCmd::UDATA_WRITEF64:
     {
         if(inst.b.kind == IrOpKind::Inst)
-            build.vmovsd(qword[regOp(inst.a) + regOp(inst.b) + offsetof(Udata, data)], inst.regX64);
+            build.vmovsd(qword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)], inst.regX64);
         else
             build.vmovsd(qword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], inst.regX64);
         break;
