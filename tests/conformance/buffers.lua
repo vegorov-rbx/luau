@@ -3,6 +3,18 @@ print("testing byte buffer library")
 
 -- TODO: 2 spaces instead of 4 for tests I guess
 
+function call(fn, ...)
+    local ok, res = pcall(fn, ...)
+    assert(ok)
+    return res
+end
+
+function ecall(fn, ...)
+    local ok, err = pcall(fn, ...)
+    assert(not ok)
+    return err:sub((err:find(": ") or -1) + 2, #err)
+end
+
 local function simple_byte_reads()
     local b = buf.create(1024)
 
@@ -97,18 +109,6 @@ simple_string_ops()
 
 -- bounds checking!
 
-function call(fn, ...)
-    local ok, res = pcall(fn, ...)
-    assert(ok)
-    return res
-end
-
-function ecall(fn, ...)
-    local ok, err = pcall(fn, ...)
-    assert(not ok)
-    return err:sub((err:find(": ") or -1) + 2, #err)
-end
-
 local function createchecks()
     assert(ecall(function() buf.create(-1) end) == "invalid buffer size")
     assert(ecall(function() buf.create(10e10) end) == "invalid buffer size")
@@ -186,6 +186,19 @@ local function boundchecks()
     --assert(ecall(function() buf.writef64(b, 0, 0) end) == "attempt to write f64 past the length of a buffer") -- TODO
     assert(ecall(function() buf.writef64(b, -1, 0) end) == "attempt to write f64 past the length of a buffer")
     assert(ecall(function() buf.writef64(b, -100000, 0) end) == "attempt to write f64 past the length of a buffer")
+
+    -- string
+    assert(call(function() return buf.readstring(b, 1016, 8) end) == "\0\0\0\0\0\0\0\0")
+    assert(ecall(function() buf.readstring(b, 1017, 8) end) == "attempt to read string past the length of a buffer")
+    --assert(ecall(function() buf.readstring(b, 0, 8) end) == "attempt to read string past the length of a buffer") -- TODO
+    assert(ecall(function() buf.readstring(b, -1, 8) end) == "attempt to read string past the length of a buffer")
+    assert(ecall(function() buf.readstring(b, -100000, 8) end) == "attempt to read string past the length of a buffer")
+
+    call(function() buf.writestring(b, 1016, 0, "abcdefgh") end)
+    assert(ecall(function() buf.writestring(b, 1017, "abcdefgh") end) == "attempt to write string past the length of a buffer")
+    --assert(ecall(function() buf.writestring(b, 0, "abcdefgh") end) == "attempt to write string past the length of a buffer") -- TODO
+    assert(ecall(function() buf.writestring(b, -1, "abcdefgh") end) == "attempt to write string past the length of a buffer")
+    assert(ecall(function() buf.writestring(b, -100000, "abcdefgh") end) == "attempt to write string past the length of a buffer")
 end
 
 boundchecks()
@@ -232,6 +245,14 @@ local function boundcheckssmall()
     assert(ecall(function() buf.writef64(b, 0, 0) end) == "attempt to write f64 past the length of a buffer")
     assert(ecall(function() buf.writef64(b, -1, 0) end) == "attempt to write f64 past the length of a buffer")
     assert(ecall(function() buf.writef64(b, -7, 0) end) == "attempt to write f64 past the length of a buffer")
+
+    -- string
+    assert(ecall(function() buf.readstring(b, 0, 8) end) == "attempt to read string past the length of a buffer")
+    assert(ecall(function() buf.readstring(b, -1, 8) end) == "attempt to read string past the length of a buffer")
+    assert(ecall(function() buf.readstring(b, -8, 8) end) == "attempt to read string past the length of a buffer")
+    assert(ecall(function() buf.writestring(b, 0, "abcdefgh") end) == "attempt to write string past the length of a buffer")
+    assert(ecall(function() buf.writestring(b, -1, "abcdefgh") end) == "attempt to write string past the length of a buffer")
+    assert(ecall(function() buf.writestring(b, -7, "abcdefgh") end) == "attempt to write string past the length of a buffer")
 end
 
 boundcheckssmall()
@@ -250,8 +271,10 @@ local function boundchecksempty()
     assert(ecall(function() buf.readi32(b, 0) end) == "attempt to read i32 past the length of a buffer")
     assert(ecall(function() buf.readf32(b, 0) end) == "attempt to read f32 past the length of a buffer")
     assert(ecall(function() buf.readf64(b, 0) end) == "attempt to read f64 past the length of a buffer")
+    assert(ecall(function() buf.readstring(b, 0, 1) end) == "attempt to read string past the length of a buffer")
+    assert(ecall(function() buf.readstring(b, 0, 8) end) == "attempt to read string past the length of a buffer")
 end
 
-boundcheckssmall()
+boundchecksempty()
 
 return('OK')
