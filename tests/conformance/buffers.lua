@@ -3,7 +3,6 @@ print("testing byte buffer library")
 
 -- TODO: 2 spaces instead of 4 for tests I guess
 
---[[
 local function simple_byte_reads()
     local b = buf.create(1024)
 
@@ -95,7 +94,7 @@ local function simple_string_ops()
 end
 
 simple_string_ops()
-]]
+
 -- bounds checking!
 
 function call(fn, ...)
