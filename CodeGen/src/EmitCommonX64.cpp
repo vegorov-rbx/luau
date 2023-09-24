@@ -132,22 +132,6 @@ void getTableNodeAtCachedSlot(AssemblyBuilderX64& build, RegisterX64 tmp, Regist
     build.add(node, tmp);
 }
 
-void convertNumberToIndexOrJump(AssemblyBuilderX64& build, RegisterX64 tmp, RegisterX64 numd, RegisterX64 numi, Label& label)
-{
-    LUAU_ASSERT(numi.size == SizeX64::dword);
-
-    // Convert to integer, NaN is converted into 0x80000000
-    build.vcvttsd2si(numi, numd);
-
-    // Convert that integer back to double
-    build.vcvtsi2sd(tmp, numd, numi);
-
-    build.vucomisd(tmp, numd); // Sets ZF=1 if equal or NaN
-    // We don't need non-integer values
-    // But to skip the PF=1 check, we proceed with NaN because 0x80000000 index is out of bounds
-    build.jcc(ConditionX64::NotZero, label);
-}
-
 void callArithHelper(IrRegAllocX64& regs, AssemblyBuilderX64& build, int ra, int rb, OperandX64 c, TMS tm)
 {
     IrCallWrapperX64 callWrap(regs, build);
