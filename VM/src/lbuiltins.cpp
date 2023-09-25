@@ -1326,12 +1326,12 @@ static int luauF_readi8(lua_State* L, StkId res, TValue* arg0, int nresults, Stk
     if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
     {
         void* buf = uvalue(arg0)->data;
+        double n1 = nvalue(args);
 
         unsigned len = unsigned(uvalue(arg0)->len);
-        unsigned offset;
-        luai_num2unsigned(offset, nvalue(args)); // TODO: different semantics from int
+        int offset = int(n1);
 
-        if(uint64_t(offset) + 1 > uint64_t(len))
+        if(unsigned(offset) >= unsigned(len))
             return -1;
 
         int8_t val = ((int8_t*)buf)[offset];
@@ -1351,10 +1351,9 @@ static int luauF_writei8(lua_State* L, StkId res, TValue* arg0, int nresults, St
         double n2 = nvalue(args + 1);
 
         unsigned len = unsigned(uvalue(arg0)->len);
-        unsigned offset;
-        luai_num2unsigned(offset, n1); // TODO: different semantics from int
+        int offset = int(n1);
 
-        if(uint64_t(offset) + 1 > uint64_t(len))
+        if(unsigned(offset) >= unsigned(len))
             return -1;
 
         ((int8_t*)buf)[offset] = int8_t(n2);
@@ -1369,14 +1368,13 @@ static int luauF_readi32(lua_State* L, StkId res, TValue* arg0, int nresults, St
     if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
     {
         void* buf = uvalue(arg0)->data;
+        double n1 = nvalue(args);
 
         unsigned len = unsigned(uvalue(arg0)->len);
-        unsigned offset;
-        luai_num2unsigned(offset, nvalue(args)); // TODO: different semantics from int
-
+        int offset = int(n1);
         int32_t val;
 
-        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        if(uint64_t(unsigned(offset)) + sizeof(val) > uint64_t(len))
             return -1;
 
         memcpy(&val, (char*)buf + offset, sizeof(val));
@@ -1396,12 +1394,10 @@ static int luauF_writei32(lua_State* L, StkId res, TValue* arg0, int nresults, S
         double n2 = nvalue(args + 1);
 
         unsigned len = unsigned(uvalue(arg0)->len);
-        unsigned offset;
-        luai_num2unsigned(offset, n1); // TODO: different semantics from int
-
+        int offset = int(n1);
         int32_t val = int32_t(n2);
 
-        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        if(uint64_t(unsigned(offset)) + sizeof(val) > uint64_t(len))
             return -1;
 
         memcpy((char*)buf + offset, &val, sizeof(val));
@@ -1416,14 +1412,13 @@ static int luauF_readf32(lua_State* L, StkId res, TValue* arg0, int nresults, St
     if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
     {
         void* buf = uvalue(arg0)->data;
+        double n1 = nvalue(args);
 
         unsigned len = unsigned(uvalue(arg0)->len);
-        unsigned offset;
-        luai_num2unsigned(offset, nvalue(args)); // TODO: different semantics from int
-
+        int offset = int(n1);
         float val;
 
-        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        if(uint64_t(unsigned(offset)) + sizeof(val) > uint64_t(len))
             return -1;
 
         memcpy(&val, (char*)buf + offset, sizeof(val));
@@ -1443,12 +1438,10 @@ static int luauF_writef32(lua_State* L, StkId res, TValue* arg0, int nresults, S
         double n2 = nvalue(args + 1);
 
         unsigned len = unsigned(uvalue(arg0)->len);
-        unsigned offset;
-        luai_num2unsigned(offset, n1); // TODO: different semantics from int
-
+        int offset = int(n1);
         float val = float(n2);
 
-        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        if(uint64_t(unsigned(offset)) + sizeof(val) > uint64_t(len))
             return -1;
 
         memcpy((char*)buf + offset, &val, sizeof(val));
@@ -1463,14 +1456,13 @@ static int luauF_readf64(lua_State* L, StkId res, TValue* arg0, int nresults, St
     if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
     {
         void* buf = uvalue(arg0)->data;
+        double n1 = nvalue(args);
 
         unsigned len = unsigned(uvalue(arg0)->len);
-        unsigned offset;
-        luai_num2unsigned(offset, nvalue(args)); // TODO: different semantics from int
-
+        int offset = int(n1);
         double val;
 
-        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        if(uint64_t(unsigned(offset)) + sizeof(val) > uint64_t(len))
             return -1;
 
         memcpy(&val, (char*)buf + offset, sizeof(val));
@@ -1490,12 +1482,10 @@ static int luauF_writef64(lua_State* L, StkId res, TValue* arg0, int nresults, S
         double n2 = nvalue(args + 1);
 
         unsigned len = unsigned(uvalue(arg0)->len);
-        unsigned offset;
-        luai_num2unsigned(offset, n1); // TODO: different semantics from int
-
+        int offset = int(n1);
         double val = n2;
 
-        if(uint64_t(offset) + sizeof(val) > uint64_t(len))
+        if(uint64_t(unsigned(offset)) + sizeof(val) > uint64_t(len))
             return -1;
 
         memcpy((char*)buf + offset, &val, sizeof(val));
