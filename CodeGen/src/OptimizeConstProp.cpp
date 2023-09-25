@@ -488,14 +488,14 @@ static void handleBuiltinEffects(ConstPropState& state, LuauBuiltinFunction bfid
     case LBF_GETMETATABLE:
     case LBF_TONUMBER:
     case LBF_TOSTRING:
-    case LBF_BUF_READI8:
-    case LBF_BUF_WRITEI8:
-    case LBF_BUF_READI32:
-    case LBF_BUF_WRITEI32:
-    case LBF_BUF_READF32:
-    case LBF_BUF_WRITEF32:
-    case LBF_BUF_READF64:
-    case LBF_BUF_WRITEF64:
+    case LBF_BUFFER_READI8:
+    case LBF_BUFFER_WRITEI8:
+    case LBF_BUFFER_READI32:
+    case LBF_BUFFER_WRITEI32:
+    case LBF_BUFFER_READF32:
+    case LBF_BUFFER_WRITEF32:
+    case LBF_BUFFER_READF64:
+    case LBF_BUFFER_WRITEF64:
         break;
     case LBF_TABLE_INSERT:
         state.invalidateHeap();

@@ -10,9 +10,9 @@
 
 // TODO: luaL_checkunsigned overflow check is not compatible with NUM_TO_INDEX and this 64bit cast is pretty awful
 // Limit similar to the one we have for strings
-#define MAX_BUF_SIZE MAXSSIZE
+#define MAX_BUFFER_SIZE MAXSSIZE
 
-static int buf_create(lua_State* L)
+static int buffer_create(lua_State* L)
 {
     double dsize = luaL_checknumber(L, 1);
     int size = int(dsize);
@@ -20,7 +20,7 @@ static int buf_create(lua_State* L)
     if (double(size) != dsize || size < 0)
         luaL_error(L, "invalid buffer size");
 
-    if (size > MAX_BUF_SIZE)
+    if (size > MAX_BUFFER_SIZE)
         luaM_toobig(L);
 
     void* buf = lua_newuserdatatagged(L, size, UTAG_BUF);
@@ -29,7 +29,7 @@ static int buf_create(lua_State* L)
     return 1;
 }
 
-static int buf_readi8(lua_State* L)
+static int buffer_readi8(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -46,7 +46,7 @@ static int buf_readi8(lua_State* L)
     return 1;
 }
 
-static int buf_writei8(lua_State* L)
+static int buffer_writei8(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -63,7 +63,7 @@ static int buf_writei8(lua_State* L)
     return 0;
 }
 
-static int buf_readi16(lua_State* L)
+static int buffer_readi16(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -82,7 +82,7 @@ static int buf_readi16(lua_State* L)
     return 1;
 }
 
-static int buf_writei16(lua_State* L)
+static int buffer_writei16(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -101,7 +101,7 @@ static int buf_writei16(lua_State* L)
     return 0;
 }
 
-static int buf_readi32(lua_State* L)
+static int buffer_readi32(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -120,7 +120,7 @@ static int buf_readi32(lua_State* L)
     return 1;
 }
 
-static int buf_writei32(lua_State* L)
+static int buffer_writei32(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -139,7 +139,7 @@ static int buf_writei32(lua_State* L)
     return 0;
 }
 
-static int buf_readf32(lua_State* L)
+static int buffer_readf32(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -158,7 +158,7 @@ static int buf_readf32(lua_State* L)
     return 1;
 }
 
-static int buf_writef32(lua_State* L)
+static int buffer_writef32(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -177,7 +177,7 @@ static int buf_writef32(lua_State* L)
     return 0;
 }
 
-static int buf_readf64(lua_State* L)
+static int buffer_readf64(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -196,7 +196,7 @@ static int buf_readf64(lua_State* L)
     return 1;
 }
 
-static int buf_writef64(lua_State* L)
+static int buffer_writef64(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -213,7 +213,7 @@ static int buf_writef64(lua_State* L)
     return 0;
 }
 
-static int buf_readstring(lua_State* L)
+static int buffer_readstring(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -230,7 +230,7 @@ static int buf_readstring(lua_State* L)
     return 1;
 }
 
-static int buf_writestring(lua_State* L)
+static int buffer_writestring(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
     if (!buf)
@@ -248,27 +248,27 @@ static int buf_writestring(lua_State* L)
     return 0;
 }
 
-static const luaL_Reg buflib[] = {
-    {"create", buf_create},
-    {"readi8", buf_readi8},
-    {"writei8", buf_writei8},
-    {"readi16", buf_readi16},
-    {"writei16", buf_writei16},
-    {"readi32", buf_readi32},
-    {"writei32", buf_writei32},
-    {"readf32", buf_readf32},
-    {"writef32", buf_writef32},
-    {"readf64", buf_readf64},
-    {"writef64", buf_writef64},
-    {"readstring", buf_readstring},
-    {"writestring", buf_writestring},
+static const luaL_Reg bufferlib[] = {
+    {"create", buffer_create},
+    {"readi8", buffer_readi8},
+    {"writei8", buffer_writei8},
+    {"readi16", buffer_readi16},
+    {"writei16", buffer_writei16},
+    {"readi32", buffer_readi32},
+    {"writei32", buffer_writei32},
+    {"readf32", buffer_readf32},
+    {"writef32", buffer_writef32},
+    {"readf64", buffer_readf64},
+    {"writef64", buffer_writef64},
+    {"readstring", buffer_readstring},
+    {"writestring", buffer_writestring},
     // TODO: unsigned integers
     {NULL, NULL},
 };
 
-int luaopen_buf(lua_State* L)
+int luaopen_buffer(lua_State* L)
 {
-    luaL_register(L, LUA_BUFLIBNAME, buflib);
+    luaL_register(L, LUA_BUFFERLIBNAME, bufferlib);
 
     return 1;
 }

@@ -23,22 +23,22 @@ declare bit32: {
     countrz: (n: number) -> number,
 }
 
-declare class ByteBuffer end
+declare class buffer end
 
-declare buf: {
-    create: (number) -> ByteBuffer,
-    readi8: (ByteBuffer, number) -> number,
-    writei8: (ByteBuffer, number, number) -> (),
-    readi16: (ByteBuffer, number) -> number,
-    writei16: (ByteBuffer, number, number) -> (),
-    readi32: (ByteBuffer, number) -> number,
-    writei32: (ByteBuffer, number, number) -> (),
-    readf32: (ByteBuffer, number) -> number,
-    writef32: (ByteBuffer, number, number) -> (),
-    readf64: (ByteBuffer, number) -> number,
-    writef64: (ByteBuffer, number, number) -> (),
-    readstring: (ByteBuffer, number, number) -> string,
-    writestring: (ByteBuffer, number, string) -> (),
+declare buffer: {
+    create: (number) -> buffer,
+    readi8: (buffer, number) -> number,
+    writei8: (buffer, number, number) -> (),
+    readi16: (buffer, number) -> number,
+    writei16: (buffer, number, number) -> (),
+    readi32: (buffer, number) -> number,
+    writei32: (buffer, number, number) -> (),
+    readf32: (buffer, number) -> number,
+    writef32: (buffer, number, number) -> (),
+    readf64: (buffer, number) -> number,
+    writef64: (buffer, number, number) -> (),
+    readstring: (buffer, number, number) -> string,
+    writestring: (buffer, number, string) -> (),
 }
 
 declare math: {
