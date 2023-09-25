@@ -624,10 +624,9 @@ enum class IrCmd : uint8_t
     // A: Rn (level)
     FINDUPVAL,
 
-    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // Read i8 (sign-extended to int) from userdata storage at specified offset
     // A: pointer (Udata)
     // B: int (offset)
-    // C: int (value)
     UDATA_READI8,
 
     // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
@@ -636,40 +635,37 @@ enum class IrCmd : uint8_t
     // C: int (value)
     UDATA_WRITEI8,
 
-    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // Read i32 value from userdata storage at specified offset
     // A: pointer (Udata)
     // B: int (offset)
-    // C: int (value)
     UDATA_READI32,
 
-    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // Write i32/u32 value to userdata storage at specified offset
     // A: pointer (Udata)
     // B: int (offset)
     // C: int (value)
     UDATA_WRITEI32,
 
-    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // Read float value (converted to double) from userdata storage at specified offset
     // A: pointer (Udata)
     // B: int (offset)
-    // C: int (value)
     UDATA_READF32,
 
-    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // Write float value (converted from double) to userdata storage at specified offset
     // A: pointer (Udata)
     // B: int (offset)
-    // C: int (value)
+    // C: double (value)
     UDATA_WRITEF32,
 
-    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // Read double value from userdata storage at specified offset
     // A: pointer (Udata)
     // B: int (offset)
-    // C: int (value)
     UDATA_READF64,
 
-    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
+    // Write double value to userdata storage at specified offset
     // A: pointer (Udata)
     // B: int (offset)
-    // C: int (value)
+    // C: double (value)
     UDATA_WRITEF64,
 };
 
