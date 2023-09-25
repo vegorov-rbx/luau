@@ -117,7 +117,6 @@ end
 
 createchecks()
 
--- TODO: with 1-based indexing this all has to be adjusted, yay
 -- TODO: message doesn't make sense for negative offsets
 
 local function boundchecks()
@@ -125,20 +124,17 @@ local function boundchecks()
 
     assert(call(function() return buffer.readi8(b, 1023) end) == 0)
     assert(ecall(function() buffer.readi8(b, 1024) end) == "attempt to read i8 past the length of a buffer")
-    --assert(ecall(function() buffer.readi8(b, 0) end) == "attempt to read i8 past the length of a buffer") -- TODO
     assert(ecall(function() buffer.readi8(b, -1) end) == "attempt to read i8 past the length of a buffer")
     assert(ecall(function() buffer.readi8(b, -100000) end) == "attempt to read i8 past the length of a buffer")
 
     call(function() buffer.writei8(b, 1023, 0) end)
     assert(ecall(function() buffer.writei8(b, 1024, 0) end) == "attempt to write i8 past the length of a buffer")
-    --assert(ecall(function() buffer.writei8(b, 0, 0) end) == "attempt to write i8 past the length of a buffer") -- TODO
     assert(ecall(function() buffer.writei8(b, -1, 0) end) == "attempt to write i8 past the length of a buffer")
     assert(ecall(function() buffer.writei8(b, -100000, 0) end) == "attempt to write i8 past the length of a buffer")
 
     -- i16
     assert(call(function() return buffer.readi16(b, 1022) end) == 0)
     assert(ecall(function() buffer.readi16(b, 1023) end) == "attempt to read i16 past the length of a buffer")
-    --assert(ecall(function() buffer.readi16(b, 0) end) == "attempt to read i16 past the length of a buffer") -- TODO
     assert(ecall(function() buffer.readi16(b, -1) end) == "attempt to read i16 past the length of a buffer")
     assert(ecall(function() buffer.readi16(b, -100000) end) == "attempt to read i16 past the length of a buffer")
     assert(ecall(function() buffer.readi16(b, 0x7fffffff) end) == "attempt to read i16 past the length of a buffer")
@@ -148,64 +144,130 @@ local function boundchecks()
 
     call(function() buffer.writei16(b, 1022, 0) end)
     assert(ecall(function() buffer.writei16(b, 1023, 0) end) == "attempt to write i16 past the length of a buffer")
-    --assert(ecall(function() buffer.writei16(b, 0, 0) end) == "attempt to write i16 past the length of a buffer") -- TODO
     assert(ecall(function() buffer.writei16(b, -1, 0) end) == "attempt to write i16 past the length of a buffer")
     assert(ecall(function() buffer.writei16(b, -100000, 0) end) == "attempt to write i16 past the length of a buffer")
 
     -- i32
     assert(call(function() return buffer.readi32(b, 1020) end) == 0)
     assert(ecall(function() buffer.readi32(b, 1021) end) == "attempt to read i32 past the length of a buffer")
-    --assert(ecall(function() buffer.readi32(b, 0) end) == "attempt to read i32 past the length of a buffer") -- TODO
     assert(ecall(function() buffer.readi32(b, -1) end) == "attempt to read i32 past the length of a buffer")
     assert(ecall(function() buffer.readi32(b, -100000) end) == "attempt to read i32 past the length of a buffer")
 
     call(function() buffer.writei32(b, 1020, 0) end)
     assert(ecall(function() buffer.writei32(b, 1021, 0) end) == "attempt to write i32 past the length of a buffer")
-    --assert(ecall(function() buffer.writei32(b, 0, 0) end) == "attempt to write i32 past the length of a buffer") -- TODO
     assert(ecall(function() buffer.writei32(b, -1, 0) end) == "attempt to write i32 past the length of a buffer")
     assert(ecall(function() buffer.writei32(b, -100000, 0) end) == "attempt to write i32 past the length of a buffer")
 
     -- f32
     assert(call(function() return buffer.readf32(b, 1020) end) == 0)
     assert(ecall(function() buffer.readf32(b, 1021) end) == "attempt to read f32 past the length of a buffer")
-    --assert(ecall(function() buffer.readf32(b, 0) end) == "attempt to read f32 past the length of a buffer") -- TODO
     assert(ecall(function() buffer.readf32(b, -1) end) == "attempt to read f32 past the length of a buffer")
     assert(ecall(function() buffer.readf32(b, -100000) end) == "attempt to read f32 past the length of a buffer")
 
     call(function() buffer.writef32(b, 1020, 0) end)
     assert(ecall(function() buffer.writef32(b, 1021, 0) end) == "attempt to write f32 past the length of a buffer")
-    --assert(ecall(function() buffer.writef32(b, 0, 0) end) == "attempt to write f32 past the length of a buffer") -- TODO
     assert(ecall(function() buffer.writef32(b, -1, 0) end) == "attempt to write f32 past the length of a buffer")
     assert(ecall(function() buffer.writef32(b, -100000, 0) end) == "attempt to write f32 past the length of a buffer")
 
     -- f64
     assert(call(function() return buffer.readf64(b, 1016) end) == 0)
     assert(ecall(function() buffer.readf64(b, 1017) end) == "attempt to read f64 past the length of a buffer")
-    --assert(ecall(function() buffer.readf64(b, 0) end) == "attempt to read f64 past the length of a buffer") -- TODO
     assert(ecall(function() buffer.readf64(b, -1) end) == "attempt to read f64 past the length of a buffer")
     assert(ecall(function() buffer.readf64(b, -100000) end) == "attempt to read f64 past the length of a buffer")
 
     call(function() buffer.writef64(b, 1016, 0) end)
     assert(ecall(function() buffer.writef64(b, 1017, 0) end) == "attempt to write f64 past the length of a buffer")
-    --assert(ecall(function() buffer.writef64(b, 0, 0) end) == "attempt to write f64 past the length of a buffer") -- TODO
     assert(ecall(function() buffer.writef64(b, -1, 0) end) == "attempt to write f64 past the length of a buffer")
     assert(ecall(function() buffer.writef64(b, -100000, 0) end) == "attempt to write f64 past the length of a buffer")
 
     -- string
     assert(call(function() return buffer.readstring(b, 1016, 8) end) == "\0\0\0\0\0\0\0\0")
     assert(ecall(function() buffer.readstring(b, 1017, 8) end) == "attempt to read string past the length of a buffer")
-    --assert(ecall(function() buffer.readstring(b, 0, 8) end) == "attempt to read string past the length of a buffer") -- TODO
     assert(ecall(function() buffer.readstring(b, -1, 8) end) == "attempt to read string past the length of a buffer")
     assert(ecall(function() buffer.readstring(b, -100000, 8) end) == "attempt to read string past the length of a buffer")
 
     call(function() buffer.writestring(b, 1016, 0, "abcdefgh") end)
     assert(ecall(function() buffer.writestring(b, 1017, "abcdefgh") end) == "attempt to write string past the length of a buffer")
-    --assert(ecall(function() buffer.writestring(b, 0, "abcdefgh") end) == "attempt to write string past the length of a buffer") -- TODO
     assert(ecall(function() buffer.writestring(b, -1, "abcdefgh") end) == "attempt to write string past the length of a buffer")
     assert(ecall(function() buffer.writestring(b, -100000, "abcdefgh") end) == "attempt to write string past the length of a buffer")
 end
 
 boundchecks()
+
+local function boundchecksnonconst(size, minus1, minusbig, intmax)
+    local b = buffer.create(size)
+
+    assert(call(function() return buffer.readi8(b, size-1) end) == 0)
+    assert(ecall(function() buffer.readi8(b, size) end) == "attempt to read i8 past the length of a buffer")
+    assert(ecall(function() buffer.readi8(b, minus1) end) == "attempt to read i8 past the length of a buffer")
+    assert(ecall(function() buffer.readi8(b, minusbig) end) == "attempt to read i8 past the length of a buffer")
+
+    call(function() buffer.writei8(b, size-1, 0) end)
+    assert(ecall(function() buffer.writei8(b, size, 0) end) == "attempt to write i8 past the length of a buffer")
+    assert(ecall(function() buffer.writei8(b, minus1, 0) end) == "attempt to write i8 past the length of a buffer")
+    assert(ecall(function() buffer.writei8(b, minusbig, 0) end) == "attempt to write i8 past the length of a buffer")
+
+    -- i16
+    assert(call(function() return buffer.readi16(b, size-2) end) == 0)
+    assert(ecall(function() buffer.readi16(b, size-1) end) == "attempt to read i16 past the length of a buffer")
+    assert(ecall(function() buffer.readi16(b, minus1) end) == "attempt to read i16 past the length of a buffer")
+    assert(ecall(function() buffer.readi16(b, minusbig) end) == "attempt to read i16 past the length of a buffer")
+    assert(ecall(function() buffer.readi16(b, intmax) end) == "attempt to read i16 past the length of a buffer")
+    assert(ecall(function() buffer.readi16(b, intmax-1) end) == "attempt to read i16 past the length of a buffer")
+    assert(ecall(function() buffer.readi16(b, intmax-2) end) == "attempt to read i16 past the length of a buffer")
+    assert(ecall(function() buffer.readi16(b, intmax+1) end) == "attempt to read i16 past the length of a buffer")
+
+    call(function() buffer.writei16(b, size-2, 0) end)
+    assert(ecall(function() buffer.writei16(b, size-1, 0) end) == "attempt to write i16 past the length of a buffer")
+    assert(ecall(function() buffer.writei16(b, minus1, 0) end) == "attempt to write i16 past the length of a buffer")
+    assert(ecall(function() buffer.writei16(b, minusbig, 0) end) == "attempt to write i16 past the length of a buffer")
+
+    -- i32
+    assert(call(function() return buffer.readi32(b, size-4) end) == 0)
+    assert(ecall(function() buffer.readi32(b, size-3) end) == "attempt to read i32 past the length of a buffer")
+    assert(ecall(function() buffer.readi32(b, minus1) end) == "attempt to read i32 past the length of a buffer")
+    assert(ecall(function() buffer.readi32(b, minusbig) end) == "attempt to read i32 past the length of a buffer")
+
+    call(function() buffer.writei32(b, size-4, 0) end)
+    assert(ecall(function() buffer.writei32(b, size-3, 0) end) == "attempt to write i32 past the length of a buffer")
+    assert(ecall(function() buffer.writei32(b, minus1, 0) end) == "attempt to write i32 past the length of a buffer")
+    assert(ecall(function() buffer.writei32(b, minusbig, 0) end) == "attempt to write i32 past the length of a buffer")
+
+    -- f32
+    assert(call(function() return buffer.readf32(b, size-4) end) == 0)
+    assert(ecall(function() buffer.readf32(b, size-3) end) == "attempt to read f32 past the length of a buffer")
+    assert(ecall(function() buffer.readf32(b, minus1) end) == "attempt to read f32 past the length of a buffer")
+    assert(ecall(function() buffer.readf32(b, minusbig) end) == "attempt to read f32 past the length of a buffer")
+
+    call(function() buffer.writef32(b, size-4, 0) end)
+    assert(ecall(function() buffer.writef32(b, size-3, 0) end) == "attempt to write f32 past the length of a buffer")
+    assert(ecall(function() buffer.writef32(b, minus1, 0) end) == "attempt to write f32 past the length of a buffer")
+    assert(ecall(function() buffer.writef32(b, minusbig, 0) end) == "attempt to write f32 past the length of a buffer")
+
+    -- f64
+    assert(call(function() return buffer.readf64(b, size-8) end) == 0)
+    assert(ecall(function() buffer.readf64(b, size-7) end) == "attempt to read f64 past the length of a buffer")
+    assert(ecall(function() buffer.readf64(b, minus1) end) == "attempt to read f64 past the length of a buffer")
+    assert(ecall(function() buffer.readf64(b, minusbig) end) == "attempt to read f64 past the length of a buffer")
+
+    call(function() buffer.writef64(b, size-8, 0) end)
+    assert(ecall(function() buffer.writef64(b, size-7, 0) end) == "attempt to write f64 past the length of a buffer")
+    assert(ecall(function() buffer.writef64(b, minus1, 0) end) == "attempt to write f64 past the length of a buffer")
+    assert(ecall(function() buffer.writef64(b, minusbig, 0) end) == "attempt to write f64 past the length of a buffer")
+
+    -- string
+    assert(call(function() return buffer.readstring(b, size-8, 8) end) == "\0\0\0\0\0\0\0\0")
+    assert(ecall(function() buffer.readstring(b, size-7, 8) end) == "attempt to read string past the length of a buffer")
+    assert(ecall(function() buffer.readstring(b, minus1, 8) end) == "attempt to read string past the length of a buffer")
+    assert(ecall(function() buffer.readstring(b, minusbig, 8) end) == "attempt to read string past the length of a buffer")
+
+    call(function() buffer.writestring(b, size-8, 0, "abcdefgh") end)
+    assert(ecall(function() buffer.writestring(b, size-7, "abcdefgh") end) == "attempt to write string past the length of a buffer")
+    assert(ecall(function() buffer.writestring(b, minus1, "abcdefgh") end) == "attempt to write string past the length of a buffer")
+    assert(ecall(function() buffer.writestring(b, minusbig, "abcdefgh") end) == "attempt to write string past the length of a buffer")
+end
+
+boundchecksnonconst(1024, -1, -100000, 0x7fffffff) -- TODO: make sure this doesn't inline
 
 local function boundcheckssmall()
     local b = buffer.create(1)
