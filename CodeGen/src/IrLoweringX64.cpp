@@ -1147,15 +1147,37 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         jumpOrAbortOnUndef(ConditionX64::NotEqual, inst.c, next);
         break;
     case IrCmd::CHECK_UDATA_LEN:
-        if(inst.b.kind == IrOpKind::Inst)
-            build.cmp(dword[regOp(inst.a) + offsetof(Udata, len)], regOp(inst.b));
-        else if(inst.b.kind == IrOpKind::Constant)
-            build.cmp(dword[regOp(inst.a) + offsetof(Udata, len)], intOp(inst.b));
-        else
-            LUAU_ASSERT(!"Unsupported instruction form");
+    {
+        int size = intOp(inst.c);
 
-        jumpOrAbortOnUndef(ConditionX64::BelowEqual, inst.c, next);
+        if(inst.b.kind == IrOpKind::Inst)
+        {
+            ScopedRegX64 tmp1{regs, SizeX64::dword};
+            ScopedRegX64 tmp2{regs, SizeX64::dword};
+
+            // Perform 64-bit add, original dword offset is zero-extended before the addition
+            build.mov(tmp1.reg, regOp(inst.b));
+            build.add(qwordReg(tmp1.reg), size);
+            build.mov(tmp2.reg, dword[regOp(inst.a) + offsetof(Udata, len)]);
+            build.cmp(qwordReg(tmp2.reg), qwordReg(tmp1.reg));
+        }
+        else if(inst.b.kind == IrOpKind::Constant)
+        {
+            int offset = intOp(inst.b);
+
+            if(offset < 0 || unsigned(offset) + unsigned(size) >= unsigned(INT_MAX))
+                jumpOrAbortOnUndef(inst.d, next);
+            else
+                build.cmp(dword[regOp(inst.a) + offsetof(Udata, len)], offset + size);
+        }
+        else
+        {
+            LUAU_ASSERT(!"Unsupported instruction form");
+        }
+
+        jumpOrAbortOnUndef(ConditionX64::Below, inst.d, next);
         break;
+    }
     case IrCmd::INTERRUPT:
     {
         unsigned pcpos = uintOp(inst.a);
@@ -1700,10 +1722,27 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
 
     case IrCmd::UDATA_WRITEF64:
     {
+        OperandX64 target = noreg;
+
         if(inst.b.kind == IrOpKind::Inst)
-            build.vmovsd(qword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)], inst.regX64);
+            target = qword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)];
         else
-            build.vmovsd(qword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], inst.regX64);
+            target = qword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)];
+
+        if(inst.c.kind == IrOpKind::Constant)
+        {
+            ScopedRegX64 tmp{regs, SizeX64::xmmword};
+            build.vmovsd(tmp.reg, build.f64(doubleOp(inst.c)));
+            build.vmovsd(target, tmp.reg);
+        }
+        else if(inst.c.kind == IrOpKind::Inst)
+        {
+            build.vmovsd(target, regOp(inst.c));
+        }
+        else
+        {
+            LUAU_ASSERT(!"Unsupported instruction form");
+        }
         break;
     }
 

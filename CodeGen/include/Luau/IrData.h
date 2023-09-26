@@ -419,10 +419,11 @@ enum class IrCmd : uint8_t
     // When undef is specified instead of a block, execution is aborted on check failure
     CHECK_UDATA_TAG,
 
-    // Guard against index overflowing the userdata length
+    // Guard against access at index of the specified size overflowing the userdata length
     // A: pointer (Udata)
-    // B: int (index)
-    // C: block/vmexit/undef
+    // B: int (offset)
+    // C: int (size)
+    // D: block/vmexit/undef
     // When undef is specified instead of a block, execution is aborted on check failure
     CHECK_UDATA_LEN,
 

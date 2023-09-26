@@ -827,8 +827,7 @@ static void translateBufferArgsAndCheckBounds(IrBuilder& build, int nparams, int
     IrOp numIndex = builtinLoadDouble(build, args);
     uintIndex = build.inst(IrCmd::NUM_TO_INT, numIndex);
 
-    IrOp uintIndexEnd = build.inst(IrCmd::ADD_INT, uintIndex, build.constInt(size));
-    build.inst(IrCmd::CHECK_UDATA_LEN, buf, uintIndexEnd, build.vmExit(pcpos));
+    build.inst(IrCmd::CHECK_UDATA_LEN, buf, uintIndex, build.constInt(size), build.vmExit(pcpos));
 }
 
 static BuiltinImplResult translateBuiltinBufferReadi8(IrBuilder& build, int nparams, int ra, int arg, IrOp args, int nresults, int pcpos)
