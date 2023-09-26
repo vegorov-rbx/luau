@@ -13,13 +13,16 @@
 // Limit similar to the one we have for strings
 #define MAX_BUFFER_SIZE MAXSSIZE
 
+static const char* kinvalidsize = "invalid buffer size";
+static const char* koutofbounds = "access out of bounds of the buffer";
+
 static int buffer_create(lua_State* L)
 {
     double dsize = luaL_checknumber(L, 1);
     int size = int(dsize);
 
     if (double(size) != dsize || size < 0)
-        luaL_error(L, "invalid buffer size");
+        luaL_error(L, kinvalidsize);
 
     if (size > MAX_BUFFER_SIZE)
         luaM_toobig(L);
@@ -40,7 +43,7 @@ static int buffer_readi8(lua_State* L)
     int offset = luaL_checkinteger(L, 2);
 
     if (unsigned(offset) >= len)
-        luaL_error(L, "attempt to read i8 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     int8_t val = ((int8_t*)buf)[offset];
     lua_pushnumber(L, double(val));
@@ -57,7 +60,7 @@ static int buffer_readu8(lua_State* L)
     int offset = luaL_checkinteger(L, 2);
 
     if (unsigned(offset) >= len)
-        luaL_error(L, "attempt to read i8 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     uint8_t val = ((uint8_t*)buf)[offset];
     lua_pushnumber(L, double(val));
@@ -75,7 +78,7 @@ static int buffer_writei8(lua_State* L)
     int value = luaL_checkinteger(L, 3);
 
     if (unsigned(offset) >= len)
-        luaL_error(L, "attempt to write i8 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     ((int8_t*)buf)[offset] = int8_t(value);
     return 0;
@@ -93,7 +96,7 @@ static int buffer_readi16(lua_State* L)
     int16_t val;
 
     if (len < 2 || unsigned(offset) >= len - 1)
-        luaL_error(L, "attempt to read i16 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -112,7 +115,7 @@ static int buffer_readu16(lua_State* L)
     uint16_t val;
 
     if (len < 2 || unsigned(offset) >= len - 1)
-        luaL_error(L, "attempt to read i16 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -132,7 +135,7 @@ static int buffer_writei16(lua_State* L)
     int16_t val = int16_t(value);
 
     if (len < 2 || unsigned(offset) >= len - 1)
-        luaL_error(L, "attempt to write i16 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
     return 0;
@@ -150,7 +153,7 @@ static int buffer_readi32(lua_State* L)
     int32_t val;
 
     if (len < 4 || unsigned(offset) >= len - 3)
-        luaL_error(L, "attempt to read i32 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -169,7 +172,7 @@ static int buffer_readu32(lua_State* L)
     uint32_t val;
 
     if (len < 4 || unsigned(offset) >= len - 3)
-        luaL_error(L, "attempt to read i32 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -187,7 +190,7 @@ static int buffer_writei32(lua_State* L)
     int val = luaL_checkinteger(L, 3);
 
     if (len < 4 || unsigned(offset) >= len - 3)
-        luaL_error(L, "attempt to write i32 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
     return 0;
@@ -204,7 +207,7 @@ static int buffer_writeu32(lua_State* L)
     unsigned val = luaL_checkunsigned(L, 3);
 
     if(len < 4 || unsigned(offset) >= len - 3)
-        luaL_error(L, "attempt to write i32 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
     return 0;
@@ -222,7 +225,7 @@ static int buffer_readf32(lua_State* L)
     float val;
 
     if (len < 4 || unsigned(offset) >= len - 3)
-        luaL_error(L, "attempt to read f32 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -242,7 +245,7 @@ static int buffer_writef32(lua_State* L)
     float val = float(value);
 
     if (len < 4 || unsigned(offset) >= len - 3)
-        luaL_error(L, "attempt to write f32 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
     return 0;
@@ -260,7 +263,7 @@ static int buffer_readf64(lua_State* L)
     double val;
 
     if (len < 8 || unsigned(offset) >= len - 7)
-        luaL_error(L, "attempt to read f64 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -278,7 +281,7 @@ static int buffer_writef64(lua_State* L)
     double val = luaL_checknumber(L, 3);
 
     if (len < 8 || unsigned(offset) >= len - 7)
-        luaL_error(L, "attempt to write f64 past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
     return 0;
@@ -295,7 +298,7 @@ static int buffer_readstring(lua_State* L)
     unsigned size = luaL_checkunsigned(L, 3);
 
     if (len < size || unsigned(offset) > len - size)
-        luaL_error(L, "attempt to read string past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     lua_pushlstring(L, (char*)buf + offset, size);
     return 1;
@@ -313,7 +316,7 @@ static int buffer_writestring(lua_State* L)
     const char* val = luaL_checklstring(L, 3, &size);
 
     if (len < size || unsigned(offset) > len - size)
-        luaL_error(L, "attempt to write string past the length of a buffer");
+        luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, val, size);
     return 0;
