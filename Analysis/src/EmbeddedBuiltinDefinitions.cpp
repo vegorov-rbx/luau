@@ -46,6 +46,7 @@ declare buffer: {
     readstring: (buffer, number, number) -> string,
     writestring: (buffer, number, string) -> (),
     len: (buffer) -> number,
+    copy: (buffer, number, number, number, buffer?) -> (),
 }
 
 declare math: {

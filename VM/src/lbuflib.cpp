@@ -15,6 +15,7 @@
 
 static const char* kinvalidsize = "invalid buffer size";
 static const char* koutofbounds = "access out of bounds of the buffer";
+static const char* knegativesize = "size cannot be negative";
 
 static int buffer_create(lua_State* L)
 {
@@ -199,14 +200,14 @@ static int buffer_writei32(lua_State* L)
 static int buffer_writeu32(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if(!buf)
+    if (!buf)
         luaL_typeerrorL(L, 1, "buffer");
 
     unsigned len = lua_objlen(L, 1);
     int offset = luaL_checkinteger(L, 2);
     unsigned val = luaL_checkunsigned(L, 3);
 
-    if(len < 4 || unsigned(offset) > len - 4)
+    if (len < 4 || unsigned(offset) > len - 4)
         luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
@@ -295,9 +296,12 @@ static int buffer_readstring(lua_State* L)
 
     unsigned len = lua_objlen(L, 1);
     int offset = luaL_checkinteger(L, 2);
-    unsigned size = luaL_checkunsigned(L, 3);
+    int size = luaL_checkinteger(L, 3);
 
-    if (len < size || unsigned(offset) > len - size)
+    if (size < 0)
+        luaL_error(L, knegativesize);
+
+    if (len < unsigned(size) || unsigned(offset) > len - unsigned(size))
         luaL_error(L, koutofbounds);
 
     lua_pushlstring(L, (char*)buf + offset, size);
@@ -315,7 +319,7 @@ static int buffer_writestring(lua_State* L)
     size_t size = 0;
     const char* val = luaL_checklstring(L, 3, &size);
 
-    if (len < size || unsigned(offset) > len - size)
+    if (len < unsigned(size) || unsigned(offset) > len - unsigned(size))
         luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, val, size);
@@ -325,11 +329,41 @@ static int buffer_writestring(lua_State* L)
 static int buffer_len(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if(!buf)
+    if (!buf)
         luaL_typeerrorL(L, 1, "buffer");
 
     lua_pushnumber(L, double(lua_objlen(L, 1)));
     return 1;
+}
+
+static int buffer_copy(lua_State* L)
+{
+    void* sbuf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if (!sbuf)
+        luaL_typeerrorL(L, 1, "buffer");
+    unsigned slen = lua_objlen(L, 1);
+
+    int soffset = luaL_checkinteger(L, 2);
+    int size = luaL_checkinteger(L, 3);
+    int toffset = luaL_checkinteger(L, 4);
+    int tu = !lua_isnoneornil(L, 5) ? 5 : 1; // destination userdata
+
+    void* tbuf = lua_touserdatatagged(L, tu, UTAG_BUF);
+    if (!tbuf)
+        luaL_typeerrorL(L, tu, "buffer");
+    unsigned tlen = lua_objlen(L, tu);
+
+    if (size < 0)
+        luaL_error(L, knegativesize);
+
+    if (slen < unsigned(size) || unsigned(soffset) > slen - unsigned(size))
+        luaL_error(L, koutofbounds);
+
+    if (tlen < unsigned(size) || unsigned(toffset) > tlen - unsigned(size))
+        luaL_error(L, koutofbounds);
+
+    memcpy((char*)tbuf + toffset, (char*)sbuf + soffset, size);
+    return 0;
 }
 
 static const luaL_Reg bufferlib[] = {
@@ -353,6 +387,7 @@ static const luaL_Reg bufferlib[] = {
     {"readstring", buffer_readstring},
     {"writestring", buffer_writestring},
     {"len", buffer_len},
+    {"copy", buffer_copy},
     {NULL, NULL},
 };
 

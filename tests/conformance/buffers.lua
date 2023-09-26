@@ -109,6 +109,28 @@ end
 
 simple_string_ops()
 
+local function simple_copy_ops()
+    local b1 = buffer.create(1024)
+    local b2 = buffer.create(1024)
+
+    buffer.writestring(b1, 200, "hello")
+    buffer.writestring(b1, 100, "world")
+
+    buffer.copy(b1, 100, 5, 300)
+
+    buffer.writei8(b2, 35, string.byte(' '))
+    buffer.writei8(b2, 41, string.byte('!'))
+
+    buffer.copy(b1, 200, 5, 30, b2)
+    buffer.copy(b1, 300, 5, 36, b2)
+
+    local str = buffer.readstring(b2, 30, 12)
+
+    assert(str == "hello world!")
+end
+
+simple_copy_ops()
+
 -- bounds checking
 
 local function createchecks()
@@ -183,13 +205,26 @@ local function boundchecks()
     -- string
     assert(call(function() return buffer.readstring(b, 1016, 8) end) == "\0\0\0\0\0\0\0\0")
     assert(ecall(function() buffer.readstring(b, 1017, 8) end) == "access out of bounds of the buffer")
-    assert(ecall(function() buffer.readstring(b, -1, 8) end) == "access out of bounds of the buffer")
+    assert(ecall(function() buffer.readstring(b, -1, -8) end) == "size cannot be negative")
+    assert(ecall(function() buffer.readstring(b, -100000, 8) end) == "access out of bounds of the buffer")
     assert(ecall(function() buffer.readstring(b, -100000, 8) end) == "access out of bounds of the buffer")
 
     call(function() buffer.writestring(b, 1016, "abcdefgh") end)
     assert(ecall(function() buffer.writestring(b, 1017, "abcdefgh") end) == "access out of bounds of the buffer")
     assert(ecall(function() buffer.writestring(b, -1, "abcdefgh") end) == "access out of bounds of the buffer")
     assert(ecall(function() buffer.writestring(b, -100000, "abcdefgh") end) == "access out of bounds of the buffer")
+
+    -- copy
+    assert(ecall(function() buffer.copy(b, 200, 1000, 30) end) == "access out of bounds of the buffer")
+    assert(ecall(function() buffer.copy(b, 200, -5, 30) end) == "size cannot be negative")
+    assert(ecall(function() buffer.copy(b, 2000, 10, 30) end) == "access out of bounds of the buffer")
+    assert(ecall(function() buffer.copy(b, -1, 10, 30) end) == "access out of bounds of the buffer")
+    assert(ecall(function() buffer.copy(b, -10, 10, 30) end) == "access out of bounds of the buffer")
+    assert(ecall(function() buffer.copy(b, -100000, 10, 30) end) == "access out of bounds of the buffer")
+
+    local b2 = buffer.create(1024)
+    assert(ecall(function() buffer.copy(b, 200, 200, -200) end) == "access out of bounds of the buffer")
+    assert(ecall(function() buffer.copy(b, 200, 200, 825) end) == "access out of bounds of the buffer")
 end
 
 boundchecks()
