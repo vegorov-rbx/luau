@@ -304,6 +304,132 @@ static int buffer_copy(lua_State* L)
     return 0;
 }
 
+static int buffer_pushi8(lua_State* L)
+{
+    LuauBuffer* buffer = getbuffer(L, 1);
+    int value = luaL_checkinteger(L, 2);
+
+    if (buffer->pos + 1 > buffer->len)
+        luaL_error(L, "buffer is full");
+
+    ((int8_t*)buffer->data)[buffer->pos] = int8_t(value);
+    buffer->pos += 1;
+    return 0;
+}
+
+static int buffer_pushi16(lua_State* L)
+{
+    LuauBuffer* buffer = getbuffer(L, 1);
+    int value = luaL_checkinteger(L, 2);
+
+    int16_t val = int16_t(value);
+
+    if(buffer->pos + sizeof(val) > buffer->len)
+        luaL_error(L, "buffer is full");
+
+    memcpy((char*)buffer->data + buffer->pos, &val, sizeof(val));
+    buffer->pos += sizeof(val);
+    return 0;
+}
+
+static int buffer_pushi32(lua_State* L)
+{
+    LuauBuffer* buffer = getbuffer(L, 1);
+    int32_t val = luaL_checkinteger(L, 2);
+
+    if(buffer->pos + sizeof(val) > buffer->len)
+        luaL_error(L, "buffer is full");
+
+    memcpy((char*)buffer->data + buffer->pos, &val, sizeof(val));
+    buffer->pos += sizeof(val);
+    return 0;
+}
+
+static int buffer_pushu32(lua_State* L)
+{
+    LuauBuffer* buffer = getbuffer(L, 1);
+    uint32_t val = luaL_checkunsigned(L, 2);
+
+    if(buffer->pos + sizeof(val) > buffer->len)
+        luaL_error(L, "buffer is full");
+
+    memcpy((char*)buffer->data + buffer->pos, &val, sizeof(val));
+    buffer->pos += sizeof(val);
+    return 0;
+}
+
+static int buffer_pushf32(lua_State* L)
+{
+    LuauBuffer* buffer = getbuffer(L, 1);
+    float val = float(luaL_checknumber(L, 2));
+
+    if(buffer->pos + sizeof(val) > buffer->len)
+        luaL_error(L, "buffer is full");
+
+    memcpy((char*)buffer->data + buffer->pos, &val, sizeof(val));
+    buffer->pos += sizeof(val);
+    return 0;
+}
+
+static int buffer_pushf64(lua_State* L)
+{
+    LuauBuffer* buffer = getbuffer(L, 1);
+    double val = luaL_checknumber(L, 2);
+
+    if(buffer->pos + sizeof(val) > buffer->len)
+        luaL_error(L, "buffer is full");
+
+    memcpy((char*)buffer->data + buffer->pos, &val, sizeof(val));
+    buffer->pos += sizeof(val);
+    return 0;
+}
+
+static int buffer_pushstring(lua_State* L)
+{
+    LuauBuffer* buffer = getbuffer(L, 1);
+    size_t size = 0;
+    const char* val = luaL_checklstring(L, 2, &size);
+
+    if(buffer->pos + size > buffer->len)
+        luaL_error(L, "buffer is full");
+
+    memcpy((char*)buffer->data + buffer->pos, val, size);
+    buffer->pos += unsigned(size);
+    return 0;
+}
+
+static int buffer_skip(lua_State* L)
+{
+    LuauBuffer* buffer = getbuffer(L, 1);
+    int val = luaL_checkinteger(L, 2);
+
+    if (val < 0)
+        luaL_error(L, "can't skip back"); // TODO: maybe?
+
+    // TODO: recheck this bound check
+    if(buffer->pos + unsigned(val) > buffer->len)
+        luaL_error(L, "buffer is full");
+
+    buffer->pos += unsigned(val);
+    return 0;
+}
+
+static int buffer_pos(lua_State* L)
+{
+    LuauBuffer* buffer = getbuffer(L, 1);
+
+    lua_pushnumber(L, double(buffer->pos));
+    return 1;
+}
+
+static int buffer_rewind(lua_State* L)
+{
+    LuauBuffer* buffer = getbuffer(L, 1);
+
+    buffer->pos = 0;
+    return 0;
+}
+
 static const luaL_Reg bufferlib[] = {
     {"create", buffer_create},
     {"readi8", buffer_readi8},
@@ -326,6 +452,18 @@ static const luaL_Reg bufferlib[] = {
     {"writestring", buffer_writestring},
     {"len", buffer_len},
     {"copy", buffer_copy},
+    {"pushi8", buffer_pushi8},
+    {"pushu8", buffer_pushi8}, // reuse the i16 function as it has the same result
+    {"pushi16", buffer_pushi16},
+    {"pushu16", buffer_pushi16}, // reuse the i16 function as it has the same result
+    {"pushi32", buffer_pushi32},
+    {"pushu32", buffer_pushu32}, // can't reuse pushi32, because double -> unsigned conversion is required
+    {"pushf32", buffer_pushf32},
+    {"pushf64", buffer_pushf64},
+    {"pushstring", buffer_pushstring},
+    {"skip", buffer_skip},
+    {"pos", buffer_pos},
+    {"rewind", buffer_rewind},
     {NULL, NULL},
 };
 

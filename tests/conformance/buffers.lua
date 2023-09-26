@@ -131,6 +131,81 @@ end
 
 simple_copy_ops()
 
+-- pushable interface
+
+local function push_bytes(start: number)
+    local b = buffer.create(1024)
+
+    buffer.skip(b, start)
+    buffer.pushi8(b, 32)
+    assert(buffer.readi8(b, start) == 32)
+    buffer.pushi8(b, 1)
+    buffer.pushi8(b, 2)
+    buffer.pushi8(b, 3)
+    buffer.pushi8(b, 4)
+    buffer.pushi8(b, 5)
+    assert(buffer.readi8(b, start + 1) == 1)
+    assert(buffer.readi8(b, start + 2) == 2)
+    assert(buffer.readi8(b, start + 3) == 3)
+    assert(buffer.readi8(b, start + 4) == 4)
+    assert(buffer.readi8(b, start + 5) == 5)
+
+    local x = buffer.readi8(b, start + 4) + buffer.readi8(b, start + 3)
+    assert(x == 7)
+end
+
+push_bytes(5)
+push_bytes(30)
+
+local function push_float_reinterpret()
+    local b = buffer.create(1024)
+
+    buffer.skip(b, 10)
+    buffer.pushi32(b, 0x3f800000)
+    local one = buffer.readf32(b, 10)
+    assert(one == 1.0)
+
+    buffer.pushf32(b, 2.75197)
+    local magic = buffer.readi32(b, buffer.pos(b) - 4)
+    assert(magic == 0x40302047)
+end
+
+push_float_reinterpret()
+
+local function push_double_reinterpret()
+    local b = buffer.create(1024)
+    
+    buffer.skip(b, 10)
+    buffer.pushi32(b, 0x00000000)
+    buffer.pushi32(b, 0x3ff00000)
+    local one = buffer.readf64(b, 10)
+    assert(one == 1.0)
+
+    buffer.pushf64(b, 1.437576533064206)
+    local magic1 = buffer.readi32(b, 18)
+    local magic2 = buffer.readi32(b, 22)
+
+    assert(magic1 == 0x40302010)
+    assert(magic2 == 0x3ff70050)
+end
+
+push_double_reinterpret()
+
+local function push_string_ops()
+    local b = buffer.create(1024)
+    
+    buffer.skip(b, 10)
+    buffer.pushstring(b, "hello")
+    buffer.pushstring(b, " world")
+    buffer.pushi8(b, string.byte('!'))
+
+    local str = buffer.readstring(b, 10, 12)
+
+    assert(str == "hello world!")
+end
+
+push_string_ops()
+
 -- bounds checking
 
 local function createchecks()

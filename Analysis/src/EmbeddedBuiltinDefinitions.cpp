@@ -47,6 +47,18 @@ declare buffer: {
     writestring: (buffer, number, string) -> (),
     len: (buffer) -> number,
     copy: (buffer, number, number, number, buffer?) -> (),
+    pushi8: (buffer, number) -> (),
+    pushu8: (buffer, number) -> (),
+    pushi16: (buffer, number) -> (),
+    pushu16: (buffer, number) -> (),
+    pushi32: (buffer, number) -> (),
+    pushu32: (buffer, number) -> (),
+    pushf32: (buffer, number) -> (),
+    pushf64: (buffer, number) -> (),
+    pushstring: (buffer, number) -> (),
+    skip: (buffer, number) -> (),
+    pos: (buffer) -> number,
+    rewind: (buffer) -> (),
 }
 
 declare math: {
