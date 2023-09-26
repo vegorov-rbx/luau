@@ -18,6 +18,8 @@ end
 local function simple_byte_reads()
     local b = buffer.create(1024)
 
+    assert(buffer.len(b) == 1024)
+
     assert(buffer.readi8(b, 5) == 0)
     buffer.writei8(b, 10, 32)
     assert(buffer.readi8(b, 10) == 32)

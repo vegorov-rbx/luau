@@ -322,6 +322,16 @@ static int buffer_writestring(lua_State* L)
     return 0;
 }
 
+static int buffer_len(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    lua_pushnumber(L, double(lua_objlen(L, 1)));
+    return 1;
+}
+
 static const luaL_Reg bufferlib[] = {
     {"create", buffer_create},
     {"readi8", buffer_readi8},
@@ -342,6 +352,7 @@ static const luaL_Reg bufferlib[] = {
     {"writef64", buffer_writef64},
     {"readstring", buffer_readstring},
     {"writestring", buffer_writestring},
+    {"len", buffer_len},
     {NULL, NULL},
 };
 

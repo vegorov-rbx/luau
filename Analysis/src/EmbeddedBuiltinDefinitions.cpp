@@ -45,6 +45,7 @@ declare buffer: {
     writef64: (buffer, number, number) -> (),
     readstring: (buffer, number, number) -> string,
     writestring: (buffer, number, string) -> (),
+    len: (buffer) -> number,
 }
 
 declare math: {
