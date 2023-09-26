@@ -343,4 +343,44 @@ end
 
 boundchecksempty()
 
+local function intuint()
+    local b = buffer.create(32)
+
+    buffer.writeu32(b, 0, 0xffffffff)
+    assert(buffer.readi8(b, 0) == -1)
+    assert(buffer.readu8(b, 0) == 255)
+    assert(buffer.readi16(b, 0) == -1)
+    assert(buffer.readu16(b, 0) == 65535)
+    assert(buffer.readi32(b, 0) == -1)
+    assert(buffer.readu32(b, 0) == 4294967295)
+
+    buffer.writei32(b, 0, -1)
+    assert(buffer.readi8(b, 0) == -1)
+    assert(buffer.readu8(b, 0) == 255)
+    assert(buffer.readi16(b, 0) == -1)
+    assert(buffer.readu16(b, 0) == 65535)
+    assert(buffer.readi32(b, 0) == -1)
+    assert(buffer.readu32(b, 0) == 4294967295)
+
+    buffer.writei16(b, 0, 65535)
+    buffer.writei16(b, 2, -1)
+    assert(buffer.readi8(b, 0) == -1)
+    assert(buffer.readu8(b, 0) == 255)
+    assert(buffer.readi16(b, 0) == -1)
+    assert(buffer.readu16(b, 0) == 65535)
+    assert(buffer.readi32(b, 0) == -1)
+    assert(buffer.readu32(b, 0) == 4294967295)
+
+    buffer.writeu16(b, 0, 65535)
+    buffer.writeu16(b, 2, -1)
+    assert(buffer.readi8(b, 0) == -1)
+    assert(buffer.readu8(b, 0) == 255)
+    assert(buffer.readi16(b, 0) == -1)
+    assert(buffer.readu16(b, 0) == 65535)
+    assert(buffer.readi32(b, 0) == -1)
+    assert(buffer.readu32(b, 0) == 4294967295)
+end
+
+intuint()
+
 return('OK')

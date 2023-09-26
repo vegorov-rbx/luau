@@ -8,7 +8,8 @@
 
 #include <string>
 
-// TODO: luaL_checkunsigned overflow check is not compatible with NUM_TO_INDEX and this 64bit cast is pretty awful
+// TODO: error messages mention the type, making the reuse of iN for uN have the wrong message
+
 // Limit similar to the one we have for strings
 #define MAX_BUFFER_SIZE MAXSSIZE
 
@@ -46,6 +47,23 @@ static int buffer_readi8(lua_State* L)
     return 1;
 }
 
+static int buffer_readu8(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if (!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    int offset = luaL_checkinteger(L, 2);
+
+    if (unsigned(offset) >= len)
+        luaL_error(L, "attempt to read i8 past the length of a buffer");
+
+    uint8_t val = ((uint8_t*)buf)[offset];
+    lua_pushnumber(L, double(val));
+    return 1;
+}
+
 static int buffer_writei8(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
@@ -73,6 +91,25 @@ static int buffer_readi16(lua_State* L)
     int offset = luaL_checkinteger(L, 2);
 
     int16_t val;
+
+    if (len < 2 || unsigned(offset) >= len - 1)
+        luaL_error(L, "attempt to read i16 past the length of a buffer");
+
+    memcpy(&val, (char*)buf + offset, sizeof(val));
+    lua_pushnumber(L, double(val));
+    return 1;
+}
+
+static int buffer_readu16(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if (!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    int offset = luaL_checkinteger(L, 2);
+
+    uint16_t val;
 
     if (len < 2 || unsigned(offset) >= len - 1)
         luaL_error(L, "attempt to read i16 past the length of a buffer");
@@ -120,6 +157,25 @@ static int buffer_readi32(lua_State* L)
     return 1;
 }
 
+static int buffer_readu32(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if (!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    int offset = luaL_checkinteger(L, 2);
+
+    uint32_t val;
+
+    if (len < 4 || unsigned(offset) >= len - 3)
+        luaL_error(L, "attempt to read i32 past the length of a buffer");
+
+    memcpy(&val, (char*)buf + offset, sizeof(val));
+    lua_pushnumber(L, double(val));
+    return 1;
+}
+
 static int buffer_writei32(lua_State* L)
 {
     void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
@@ -128,11 +184,26 @@ static int buffer_writei32(lua_State* L)
 
     unsigned len = lua_objlen(L, 1);
     int offset = luaL_checkinteger(L, 2);
-    int value = luaL_checkinteger(L, 3);
-
-    int32_t val = int32_t(value);
+    int val = luaL_checkinteger(L, 3);
 
     if (len < 4 || unsigned(offset) >= len - 3)
+        luaL_error(L, "attempt to write i32 past the length of a buffer");
+
+    memcpy((char*)buf + offset, &val, sizeof(val));
+    return 0;
+}
+
+static int buffer_writeu32(lua_State* L)
+{
+    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
+    if(!buf)
+        luaL_typeerrorL(L, 1, "buffer");
+
+    unsigned len = lua_objlen(L, 1);
+    int offset = luaL_checkinteger(L, 2);
+    unsigned val = luaL_checkunsigned(L, 3);
+
+    if(len < 4 || unsigned(offset) >= len - 3)
         luaL_error(L, "attempt to write i32 past the length of a buffer");
 
     memcpy((char*)buf + offset, &val, sizeof(val));
@@ -251,18 +322,23 @@ static int buffer_writestring(lua_State* L)
 static const luaL_Reg bufferlib[] = {
     {"create", buffer_create},
     {"readi8", buffer_readi8},
+    {"readu8", buffer_readu8},
     {"writei8", buffer_writei8},
+    {"writeu8", buffer_writei8}, // reuse the i8 function as it has the same result
     {"readi16", buffer_readi16},
+    {"readu16", buffer_readu16},
     {"writei16", buffer_writei16},
+    {"writeu16", buffer_writei16}, // reuse the i16 function as it has the same result
     {"readi32", buffer_readi32},
+    {"readu32", buffer_readu32},
     {"writei32", buffer_writei32},
+    {"writeu32", buffer_writeu32}, // can't reuse writei32, because double -> unsigned conversion is required
     {"readf32", buffer_readf32},
     {"writef32", buffer_writef32},
     {"readf64", buffer_readf64},
     {"writef64", buffer_writef64},
     {"readstring", buffer_readstring},
     {"writestring", buffer_writestring},
-    // TODO: unsigned integers
     {NULL, NULL},
 };
 
