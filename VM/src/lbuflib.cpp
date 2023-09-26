@@ -6,9 +6,7 @@
 #include "lstring.h"
 #include "ludata.h"
 
-#include <string>
-
-// TODO: error messages mention the type, making the reuse of iN for uN have the wrong message
+#include <string.h>
 
 // Limit similar to the one we have for strings
 #define MAX_BUFFER_SIZE MAXSSIZE
