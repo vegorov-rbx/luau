@@ -1155,7 +1155,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
             if(size == 1)
             {
                 // Simpler check for a single byte access
-                build.cmp(dword[regOp(inst.a) + offsetof(Udata, len)], regOp(inst.b));
+                build.cmp(dword[regOp(inst.a) + offsetof(Udata, data) + offsetof(LuauBuffer, len)], regOp(inst.b));
                 jumpOrAbortOnUndef(ConditionX64::BelowEqual, inst.d, next);
             }
             else
@@ -1167,7 +1167,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
                 // This makes high 32 bits of the 64 register zero
                 // Now we can add the access size and get a 64 bit value that didn't wrap around for values like 0xffffffff
                 build.lea(tmp1.reg, addr[qwordReg(regOp(inst.b)) + size]);
-                build.mov(tmp2.reg, dword[regOp(inst.a) + offsetof(Udata, len)]);
+                build.mov(tmp2.reg, dword[regOp(inst.a) + offsetof(Udata, data) + offsetof(LuauBuffer, len)]);
                 build.cmp(qwordReg(tmp2.reg), tmp1.reg);
 
                 jumpOrAbortOnUndef(ConditionX64::Below, inst.d, next);
@@ -1181,7 +1181,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
             if(offset < 0 || unsigned(offset) + unsigned(size) >= unsigned(INT_MAX))
                 jumpOrAbortOnUndef(inst.d, next);
             else
-                build.cmp(dword[regOp(inst.a) + offsetof(Udata, len)], offset + size);
+                build.cmp(dword[regOp(inst.a) + offsetof(Udata, data) + offsetof(LuauBuffer, len)], offset + size);
 
             jumpOrAbortOnUndef(ConditionX64::Below, inst.d, next);
         }
@@ -1663,9 +1663,9 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         inst.regX64 = regs.allocReg(SizeX64::dword, index);
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.movsx(inst.regX64, byte[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)]);
+            build.movsx(inst.regX64, byte[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data) + offsetof(LuauBuffer, data)]);
         else
-            build.movsx(inst.regX64, byte[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)]);
+            build.movsx(inst.regX64, byte[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data) + offsetof(LuauBuffer, data)]);
         break;
     }
 
@@ -1674,9 +1674,9 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         inst.regX64 = regs.allocReg(SizeX64::dword, index);
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.movzx(inst.regX64, byte[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)]);
+            build.movzx(inst.regX64, byte[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data) + offsetof(LuauBuffer, data)]);
         else
-            build.movzx(inst.regX64, byte[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)]);
+            build.movzx(inst.regX64, byte[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data) + offsetof(LuauBuffer, data)]);
         break;
     }
 
@@ -1685,9 +1685,9 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         OperandX64 value = inst.c.kind == IrOpKind::Inst ? regOp(inst.c) : OperandX64(intOp(inst.c));
 
         if (inst.b.kind == IrOpKind::Inst)
-            build.mov(byte[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)], value);
+            build.mov(byte[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data) + offsetof(LuauBuffer, data)], value);
         else
-            build.mov(byte[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], value);
+            build.mov(byte[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data) + offsetof(LuauBuffer, data)], value);
         break;
     }
 
@@ -1696,9 +1696,9 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         inst.regX64 = regs.allocReg(SizeX64::dword, index);
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.mov(inst.regX64, dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)]);
+            build.mov(inst.regX64, dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data) + offsetof(LuauBuffer, data)]);
         else
-            build.mov(inst.regX64, dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)]);
+            build.mov(inst.regX64, dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data) + offsetof(LuauBuffer, data)]);
         break;
     }
 
@@ -1707,9 +1707,9 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         OperandX64 value = inst.c.kind == IrOpKind::Inst ? regOp(inst.c) : OperandX64(intOp(inst.c));
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.mov(dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)], value);
+            build.mov(dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data) + offsetof(LuauBuffer, data)], value);
         else
-            build.mov(dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], value);
+            build.mov(dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data) + offsetof(LuauBuffer, data)], value);
         break;
     }
 
@@ -1718,18 +1718,18 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         inst.regX64 = regs.allocReg(SizeX64::xmmword, index);
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.vcvtss2sd(inst.regX64, inst.regX64, dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)]);
+            build.vcvtss2sd(inst.regX64, inst.regX64, dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data) + offsetof(LuauBuffer, data)]);
         else
-            build.vcvtss2sd(inst.regX64, inst.regX64, dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)]);
+            build.vcvtss2sd(inst.regX64, inst.regX64, dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data) + offsetof(LuauBuffer, data)]);
         break;
     }
 
     case IrCmd::UDATA_WRITEF32:
     {
         if(inst.b.kind == IrOpKind::Inst)
-            storeDoubleAsFloat(dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)], inst.c);
+            storeDoubleAsFloat(dword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data) + offsetof(LuauBuffer, data)], inst.c);
         else
-            storeDoubleAsFloat(dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)], inst.c);
+            storeDoubleAsFloat(dword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data) + offsetof(LuauBuffer, data)], inst.c);
         break;
     }
 
@@ -1738,9 +1738,9 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         inst.regX64 = regs.allocReg(SizeX64::xmmword, index);
 
         if(inst.b.kind == IrOpKind::Inst)
-            build.vmovsd(inst.regX64, qword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)]);
+            build.vmovsd(inst.regX64, qword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data) + offsetof(LuauBuffer, data)]);
         else
-            build.vmovsd(inst.regX64, qword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)]);
+            build.vmovsd(inst.regX64, qword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data) + offsetof(LuauBuffer, data)]);
         break;
     }
 
@@ -1749,9 +1749,9 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         OperandX64 target = noreg;
 
         if(inst.b.kind == IrOpKind::Inst)
-            target = qword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)];
+            target = qword[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data) + offsetof(LuauBuffer, data)];
         else
-            target = qword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data)];
+            target = qword[regOp(inst.a) + intOp(inst.b) + offsetof(Udata, data) + offsetof(LuauBuffer, data)];
 
         if(inst.c.kind == IrOpKind::Constant)
         {

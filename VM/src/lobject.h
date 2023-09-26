@@ -448,6 +448,14 @@ typedef struct Table
 } Table;
 // clang-format on
 
+struct LuauBuffer
+{
+    unsigned int pos;
+    unsigned int len;
+
+    char data[1]; // data follows the header fields
+};
+
 /*
 ** `module' operation for hashing (size is always a power of 2)
 */
