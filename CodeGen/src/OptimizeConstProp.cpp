@@ -881,6 +881,7 @@ static void constPropInInst(ConstPropState& state, IrBuilder& build, IrFunction&
         // TODO: remove duplicate checks and update tracked userdata length when possible
         break;
     case IrCmd::UDATA_READI8:
+    case IrCmd::UDATA_READU8:
     case IrCmd::UDATA_WRITEI8:
     case IrCmd::UDATA_READI32:
     case IrCmd::UDATA_WRITEI32:

@@ -319,6 +319,8 @@ const char* getCmdName(IrCmd cmd)
         return "FINDUPVAL";
     case IrCmd::UDATA_READI8:
         return "UDATA_READI8";
+    case IrCmd::UDATA_READU8:
+        return "UDATA_READU8";
     case IrCmd::UDATA_WRITEI8:
         return "UDATA_WRITEI8";
     case IrCmd::UDATA_READI32:

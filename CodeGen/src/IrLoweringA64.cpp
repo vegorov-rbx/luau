@@ -1984,6 +1984,7 @@ void IrLoweringA64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
 
     // TODO: find the time
     case IrCmd::UDATA_READI8:
+    case IrCmd::UDATA_READU8:
     case IrCmd::UDATA_WRITEI8:
     case IrCmd::UDATA_READI32:
     case IrCmd::UDATA_WRITEI32:

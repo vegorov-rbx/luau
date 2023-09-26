@@ -630,6 +630,11 @@ enum class IrCmd : uint8_t
     // B: int (offset)
     UDATA_READI8,
 
+    // Read u8 (zero-extended to int) from userdata storage at specified offset
+    // A: pointer (Udata)
+    // B: int (offset)
+    UDATA_READU8,
+
     // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
     // A: pointer (Udata)
     // B: int (offset)
