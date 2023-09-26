@@ -6,16 +6,10 @@
 #include "lstring.h"
 #include "ludata.h"
 
-#include <string>
-
-// TODO: error messages mention the type, making the reuse of iN for uN have the wrong message
+#include <string.h>
 
 // Limit similar to the one we have for strings
 #define MAX_BUFFER_SIZE MAXSSIZE
-
-static const char* kinvalidsize = "invalid buffer size";
-static const char* koutofbounds = "access out of bounds of the buffer";
-static const char* knegativesize = "size cannot be negative";
 
 #define isoutofbounds(offset, len, accessize) ((len) < (accessize) || unsigned(offset) > (len) - (accessize))
 
@@ -25,7 +19,7 @@ static int buffer_create(lua_State* L)
     int size = int(dsize);
 
     if (double(size) != dsize || size < 0)
-        luaL_error(L, kinvalidsize);
+        luaL_error(L, "invalid buffer size");
 
     if (size > MAX_BUFFER_SIZE)
         luaM_toobig(L);
@@ -46,7 +40,7 @@ static int buffer_readi8(lua_State* L)
     int offset = luaL_checkinteger(L, 2);
 
     if (unsigned(offset) >= len)
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     int8_t val = ((int8_t*)buf)[offset];
     lua_pushnumber(L, double(val));
@@ -63,7 +57,7 @@ static int buffer_readu8(lua_State* L)
     int offset = luaL_checkinteger(L, 2);
 
     if (unsigned(offset) >= len)
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     uint8_t val = ((uint8_t*)buf)[offset];
     lua_pushnumber(L, double(val));
@@ -81,7 +75,7 @@ static int buffer_writei8(lua_State* L)
     int value = luaL_checkinteger(L, 3);
 
     if (unsigned(offset) >= len)
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     ((int8_t*)buf)[offset] = int8_t(value);
     return 0;
@@ -99,7 +93,7 @@ static int buffer_readi16(lua_State* L)
     int16_t val;
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -118,7 +112,7 @@ static int buffer_readu16(lua_State* L)
     uint16_t val;
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -138,7 +132,7 @@ static int buffer_writei16(lua_State* L)
     int16_t val = int16_t(value);
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy((char*)buf + offset, &val, sizeof(val));
     return 0;
@@ -156,7 +150,7 @@ static int buffer_readi32(lua_State* L)
     int32_t val;
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -175,7 +169,7 @@ static int buffer_readu32(lua_State* L)
     uint32_t val;
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -193,7 +187,7 @@ static int buffer_writei32(lua_State* L)
     int val = luaL_checkinteger(L, 3);
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy((char*)buf + offset, &val, sizeof(val));
     return 0;
@@ -210,7 +204,7 @@ static int buffer_writeu32(lua_State* L)
     unsigned val = luaL_checkunsigned(L, 3);
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy((char*)buf + offset, &val, sizeof(val));
     return 0;
@@ -228,7 +222,7 @@ static int buffer_readf32(lua_State* L)
     float val;
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -248,7 +242,7 @@ static int buffer_writef32(lua_State* L)
     float val = float(value);
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy((char*)buf + offset, &val, sizeof(val));
     return 0;
@@ -266,7 +260,7 @@ static int buffer_readf64(lua_State* L)
     double val;
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
     lua_pushnumber(L, double(val));
@@ -284,7 +278,7 @@ static int buffer_writef64(lua_State* L)
     double val = luaL_checknumber(L, 3);
 
     if (isoutofbounds(offset, len, sizeof(val)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy((char*)buf + offset, &val, sizeof(val));
     return 0;
@@ -301,10 +295,10 @@ static int buffer_readstring(lua_State* L)
     int size = luaL_checkinteger(L, 3);
 
     if (size < 0)
-        luaL_error(L, knegativesize);
+        luaL_error(L, "size cannot be negative");
 
     if (isoutofbounds(offset, len, unsigned(size)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     lua_pushlstring(L, (char*)buf + offset, size);
     return 1;
@@ -322,7 +316,7 @@ static int buffer_writestring(lua_State* L)
     const char* val = luaL_checklstring(L, 3, &size);
 
     if (isoutofbounds(offset, len, unsigned(size)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy((char*)buf + offset, val, size);
     return 0;
@@ -356,13 +350,13 @@ static int buffer_copy(lua_State* L)
     unsigned tlen = lua_objlen(L, tu);
 
     if (size < 0)
-        luaL_error(L, knegativesize);
+        luaL_error(L, "size cannot be negative");
 
     if (isoutofbounds(soffset, slen, unsigned(size)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     if (isoutofbounds(toffset, tlen, unsigned(size)))
-        luaL_error(L, koutofbounds);
+        luaL_error(L, "access out of bounds of the buffer");
 
     memcpy((char*)tbuf + toffset, (char*)sbuf + soffset, size);
     return 0;
