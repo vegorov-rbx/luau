@@ -122,6 +122,7 @@ IrValueKind getCmdValueKind(IrCmd cmd)
     case IrCmd::CHECK_NODE_NO_NEXT:
     case IrCmd::CHECK_NODE_VALUE:
     case IrCmd::CHECK_UDATA_TAG:
+    case IrCmd::CHECK_UDATA_LEN:
     case IrCmd::INTERRUPT:
     case IrCmd::CHECK_GC:
     case IrCmd::BARRIER_OBJ:
@@ -171,6 +172,18 @@ IrValueKind getCmdValueKind(IrCmd cmd)
         return IrValueKind::Pointer;
     case IrCmd::FINDUPVAL:
         return IrValueKind::Pointer;
+    case IrCmd::UDATA_READI8:
+    case IrCmd::UDATA_READU8:
+    case IrCmd::UDATA_READI32:
+        return IrValueKind::Int;
+    case IrCmd::UDATA_WRITEI8:
+    case IrCmd::UDATA_WRITEI32:
+    case IrCmd::UDATA_WRITEF32:
+    case IrCmd::UDATA_WRITEF64:
+        return IrValueKind::None;
+    case IrCmd::UDATA_READF32:
+    case IrCmd::UDATA_READF64:
+        return IrValueKind::Double;
     }
 
     LUAU_UNREACHABLE();
