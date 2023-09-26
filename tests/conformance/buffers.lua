@@ -107,7 +107,7 @@ end
 
 simple_string_ops()
 
--- bounds checking!
+-- bounds checking
 
 local function createchecks()
     assert(ecall(function() buffer.create(-1) end) == "invalid buffer size")
@@ -116,8 +116,6 @@ local function createchecks()
 end
 
 createchecks()
-
--- TODO: message doesn't make sense for negative offsets
 
 local function boundchecks()
     local b = buffer.create(1024)
@@ -267,7 +265,7 @@ local function boundchecksnonconst(size, minus1, minusbig, intmax)
     assert(ecall(function() buffer.writestring(b, minusbig, "abcdefgh") end) == "access out of bounds of the buffer")
 end
 
-boundchecksnonconst(1024, -1, -100000, 0x7fffffff) -- TODO: make sure this doesn't inline
+boundchecksnonconst(1024, -1, -100000, 0x7fffffff)
 
 local function boundcheckssmall()
     local b = buffer.create(1)
@@ -382,5 +380,24 @@ local function intuint()
 end
 
 intuint()
+
+local function testslowcalls()
+    getfenv()
+
+    simple_byte_reads()
+    offset_byte_reads(5)
+    offset_byte_reads(30)
+    simple_float_reinterpret()
+    simple_double_reinterpret()
+    simple_string_ops()
+    createchecks()
+    boundchecks()
+    boundchecksnonconst(1024, -1, -100000, 0x7fffffff)
+    boundcheckssmall()
+    boundchecksempty()
+    intuint()
+end
+
+testslowcalls()
 
 return('OK')
