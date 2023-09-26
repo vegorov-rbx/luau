@@ -95,7 +95,7 @@ static int buffer_readi16(lua_State* L)
 
     int16_t val;
 
-    if (len < 2 || unsigned(offset) >= len - 1)
+    if (len < 2 || unsigned(offset) > len - 2)
         luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
@@ -114,7 +114,7 @@ static int buffer_readu16(lua_State* L)
 
     uint16_t val;
 
-    if (len < 2 || unsigned(offset) >= len - 1)
+    if (len < 2 || unsigned(offset) > len - 2)
         luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
@@ -134,7 +134,7 @@ static int buffer_writei16(lua_State* L)
 
     int16_t val = int16_t(value);
 
-    if (len < 2 || unsigned(offset) >= len - 1)
+    if (len < 2 || unsigned(offset) > len - 2)
         luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
@@ -152,7 +152,7 @@ static int buffer_readi32(lua_State* L)
 
     int32_t val;
 
-    if (len < 4 || unsigned(offset) >= len - 3)
+    if (len < 4 || unsigned(offset) > len - 4)
         luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
@@ -171,7 +171,7 @@ static int buffer_readu32(lua_State* L)
 
     uint32_t val;
 
-    if (len < 4 || unsigned(offset) >= len - 3)
+    if (len < 4 || unsigned(offset) > len - 4)
         luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
@@ -189,7 +189,7 @@ static int buffer_writei32(lua_State* L)
     int offset = luaL_checkinteger(L, 2);
     int val = luaL_checkinteger(L, 3);
 
-    if (len < 4 || unsigned(offset) >= len - 3)
+    if (len < 4 || unsigned(offset) > len - 4)
         luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
@@ -206,7 +206,7 @@ static int buffer_writeu32(lua_State* L)
     int offset = luaL_checkinteger(L, 2);
     unsigned val = luaL_checkunsigned(L, 3);
 
-    if(len < 4 || unsigned(offset) >= len - 3)
+    if(len < 4 || unsigned(offset) > len - 4)
         luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
@@ -224,7 +224,7 @@ static int buffer_readf32(lua_State* L)
 
     float val;
 
-    if (len < 4 || unsigned(offset) >= len - 3)
+    if (len < 4 || unsigned(offset) > len - 4)
         luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
@@ -244,7 +244,7 @@ static int buffer_writef32(lua_State* L)
 
     float val = float(value);
 
-    if (len < 4 || unsigned(offset) >= len - 3)
+    if (len < 4 || unsigned(offset) > len - 4)
         luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
@@ -262,7 +262,7 @@ static int buffer_readf64(lua_State* L)
 
     double val;
 
-    if (len < 8 || unsigned(offset) >= len - 7)
+    if (len < 8 || unsigned(offset) > len - 8)
         luaL_error(L, koutofbounds);
 
     memcpy(&val, (char*)buf + offset, sizeof(val));
@@ -280,7 +280,7 @@ static int buffer_writef64(lua_State* L)
     int offset = luaL_checkinteger(L, 2);
     double val = luaL_checknumber(L, 3);
 
-    if (len < 8 || unsigned(offset) >= len - 7)
+    if (len < 8 || unsigned(offset) > len - 8)
         luaL_error(L, koutofbounds);
 
     memcpy((char*)buf + offset, &val, sizeof(val));
