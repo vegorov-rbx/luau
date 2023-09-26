@@ -489,9 +489,12 @@ static void handleBuiltinEffects(ConstPropState& state, LuauBuiltinFunction bfid
     case LBF_TONUMBER:
     case LBF_TOSTRING:
     case LBF_BUFFER_READI8:
+    case LBF_BUFFER_READU8:
     case LBF_BUFFER_WRITEI8:
     case LBF_BUFFER_READI32:
+    case LBF_BUFFER_READU32:
     case LBF_BUFFER_WRITEI32:
+    case LBF_BUFFER_WRITEU32:
     case LBF_BUFFER_READF32:
     case LBF_BUFFER_WRITEF32:
     case LBF_BUFFER_READF64:
