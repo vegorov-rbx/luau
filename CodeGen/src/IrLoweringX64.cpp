@@ -1154,19 +1154,21 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         {
             if(size == 1)
             {
+                // Simpler check for a single byte access
                 build.cmp(dword[regOp(inst.a) + offsetof(Udata, len)], regOp(inst.b));
                 jumpOrAbortOnUndef(ConditionX64::BelowEqual, inst.d, next);
             }
             else
             {
-                ScopedRegX64 tmp1{regs, SizeX64::dword};
+                ScopedRegX64 tmp1{regs, SizeX64::qword};
                 ScopedRegX64 tmp2{regs, SizeX64::dword};
 
-                // Perform 64-bit add, original dword offset is zero-extended before the addition
-                build.mov(tmp1.reg, regOp(inst.b));
-                build.add(qwordReg(tmp1.reg), size);
+                // Since index is an int, previous operations should have been performed on the 32 bit register
+                // This makes high 32 bits of the 64 register zero
+                // Now we can add the access size and get a 64 bit value that didn't wrap around for values like 0xffffffff
+                build.lea(tmp1.reg, addr[qwordReg(regOp(inst.b)) + size]);
                 build.mov(tmp2.reg, dword[regOp(inst.a) + offsetof(Udata, len)]);
-                build.cmp(qwordReg(tmp2.reg), qwordReg(tmp1.reg));
+                build.cmp(qwordReg(tmp2.reg), tmp1.reg);
 
                 jumpOrAbortOnUndef(ConditionX64::Below, inst.d, next);
             }
@@ -1175,6 +1177,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         {
             int offset = intOp(inst.b);
 
+            // Constant folding can take care of it, but for safety we avoid overflow/underflow cases here
             if(offset < 0 || unsigned(offset) + unsigned(size) >= unsigned(INT_MAX))
                 jumpOrAbortOnUndef(inst.d, next);
             else
