@@ -1152,14 +1152,24 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
 
         if(inst.b.kind == IrOpKind::Inst)
         {
-            ScopedRegX64 tmp1{regs, SizeX64::dword};
-            ScopedRegX64 tmp2{regs, SizeX64::dword};
+            if(size == 1)
+            {
+                build.cmp(dword[regOp(inst.a) + offsetof(Udata, len)], regOp(inst.b));
+                jumpOrAbortOnUndef(ConditionX64::BelowEqual, inst.d, next);
+            }
+            else
+            {
+                ScopedRegX64 tmp1{regs, SizeX64::dword};
+                ScopedRegX64 tmp2{regs, SizeX64::dword};
 
-            // Perform 64-bit add, original dword offset is zero-extended before the addition
-            build.mov(tmp1.reg, regOp(inst.b));
-            build.add(qwordReg(tmp1.reg), size);
-            build.mov(tmp2.reg, dword[regOp(inst.a) + offsetof(Udata, len)]);
-            build.cmp(qwordReg(tmp2.reg), qwordReg(tmp1.reg));
+                // Perform 64-bit add, original dword offset is zero-extended before the addition
+                build.mov(tmp1.reg, regOp(inst.b));
+                build.add(qwordReg(tmp1.reg), size);
+                build.mov(tmp2.reg, dword[regOp(inst.a) + offsetof(Udata, len)]);
+                build.cmp(qwordReg(tmp2.reg), qwordReg(tmp1.reg));
+
+                jumpOrAbortOnUndef(ConditionX64::Below, inst.d, next);
+            }
         }
         else if(inst.b.kind == IrOpKind::Constant)
         {
@@ -1169,13 +1179,13 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
                 jumpOrAbortOnUndef(inst.d, next);
             else
                 build.cmp(dword[regOp(inst.a) + offsetof(Udata, len)], offset + size);
+
+            jumpOrAbortOnUndef(ConditionX64::Below, inst.d, next);
         }
         else
         {
             LUAU_ASSERT(!"Unsupported instruction form");
         }
-
-        jumpOrAbortOnUndef(ConditionX64::Below, inst.d, next);
         break;
     }
     case IrCmd::INTERRUPT:
