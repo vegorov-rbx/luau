@@ -1682,7 +1682,7 @@ void IrLoweringX64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
 
     case IrCmd::UDATA_WRITEI8:
     {
-        OperandX64 value = inst.c.kind == IrOpKind::Inst ? regOp(inst.c) : OperandX64(intOp(inst.c));
+        OperandX64 value = inst.c.kind == IrOpKind::Inst ? byteReg(regOp(inst.c)) : OperandX64(intOp(inst.c));
 
         if (inst.b.kind == IrOpKind::Inst)
             build.mov(byte[regOp(inst.a) + qwordReg(regOp(inst.b)) + offsetof(Udata, data)], value);
