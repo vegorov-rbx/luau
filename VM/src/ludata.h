@@ -10,9 +10,6 @@
 // special tag value is used for newproxy-created user data
 #define UTAG_PROXY (LUA_UTAG_LIMIT + 1)
 
-// special tag value is used for byte buffer user data (all other user data objects are host-exposed)
-#define UTAG_BUF (LUA_UTAG_LIMIT + 2)
-
 #define sizeudata(len) (offsetof(Udata, data) + len)
 
 LUAI_FUNC Udata* luaU_newudata(lua_State* L, size_t s, int tag);

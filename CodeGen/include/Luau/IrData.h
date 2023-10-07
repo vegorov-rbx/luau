@@ -412,20 +412,13 @@ enum class IrCmd : uint8_t
     // When undef is specified instead of a block, execution is aborted on check failure
     CHECK_NODE_VALUE,
 
-    // Guard against userdata tag mismatch
-    // A: pointer (Udata)
-    // B: int (tag)
-    // C: block/vmexit/undef
-    // When undef is specified instead of a block, execution is aborted on check failure
-    CHECK_UDATA_TAG,
-
-    // Guard against access at index of the specified size overflowing the userdata length
-    // A: pointer (Udata)
+    // Guard against access at index of the specified size overflowing the buffer length
+    // A: pointer (Buffer)
     // B: int (offset)
     // C: int (size)
     // D: block/vmexit/undef
     // When undef is specified instead of a block, execution is aborted on check failure
-    CHECK_UDATA_LEN,
+    CHECK_BUFFER_LEN,
 
     // Special operations
 
@@ -625,54 +618,54 @@ enum class IrCmd : uint8_t
     // A: Rn (level)
     FINDUPVAL,
 
-    // Read i8 (sign-extended to int) from userdata storage at specified offset
-    // A: pointer (Udata)
+    // Read i8 (sign-extended to int) from buffer storage at specified offset
+    // A: pointer (Buffer)
     // B: int (offset)
-    UDATA_READI8,
+    BUFFER_READI8,
 
-    // Read u8 (zero-extended to int) from userdata storage at specified offset
-    // A: pointer (Udata)
+    // Read u8 (zero-extended to int) from buffer storage at specified offset
+    // A: pointer (Buffer)
     // B: int (offset)
-    UDATA_READU8,
+    BUFFER_READU8,
 
-    // Write i8/u8 value (int argument is truncated) to userdata storage at specified offset
-    // A: pointer (Udata)
+    // Write i8/u8 value (int argument is truncated) to buffer storage at specified offset
+    // A: pointer (Buffer)
     // B: int (offset)
     // C: int (value)
-    UDATA_WRITEI8,
+    BUFFER_WRITEI8,
 
-    // Read i32 value from userdata storage at specified offset
-    // A: pointer (Udata)
+    // Read i32 value from buffer storage at specified offset
+    // A: pointer (Buffer)
     // B: int (offset)
-    UDATA_READI32,
+    BUFFER_READI32,
 
-    // Write i32/u32 value to userdata storage at specified offset
-    // A: pointer (Udata)
+    // Write i32/u32 value to buffer storage at specified offset
+    // A: pointer (Buffer)
     // B: int (offset)
     // C: int (value)
-    UDATA_WRITEI32,
+    BUFFER_WRITEI32,
 
-    // Read float value (converted to double) from userdata storage at specified offset
-    // A: pointer (Udata)
+    // Read float value (converted to double) from buffer storage at specified offset
+    // A: pointer (Buffer)
     // B: int (offset)
-    UDATA_READF32,
+    BUFFER_READF32,
 
-    // Write float value (converted from double) to userdata storage at specified offset
-    // A: pointer (Udata)
-    // B: int (offset)
-    // C: double (value)
-    UDATA_WRITEF32,
-
-    // Read double value from userdata storage at specified offset
-    // A: pointer (Udata)
-    // B: int (offset)
-    UDATA_READF64,
-
-    // Write double value to userdata storage at specified offset
-    // A: pointer (Udata)
+    // Write float value (converted from double) to buffer storage at specified offset
+    // A: pointer (Buffer)
     // B: int (offset)
     // C: double (value)
-    UDATA_WRITEF64,
+    BUFFER_WRITEF32,
+
+    // Read double value from buffer storage at specified offset
+    // A: pointer (Buffer)
+    // B: int (offset)
+    BUFFER_READF64,
+
+    // Write double value to buffer storage at specified offset
+    // A: pointer (Buffer)
+    // B: int (offset)
+    // C: double (value)
+    BUFFER_WRITEF64,
 };
 
 enum class IrConstKind : uint8_t

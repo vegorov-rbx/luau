@@ -1323,15 +1323,15 @@ static int luauF_tostring(lua_State* L, StkId res, TValue* arg0, int nresults, S
 
 static int luauF_readi8(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
+    if(nparams >= 2 && nresults <= 1 && ttisbuffer(arg0) && ttisnumber(args))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
 
-        if(unsigned(offset) >= unsigned(len))
+        if(unsigned(offset) >= len)
             return -1;
 
         int8_t val = ((int8_t*)buf)[offset];
@@ -1344,15 +1344,15 @@ static int luauF_readi8(lua_State* L, StkId res, TValue* arg0, int nresults, Stk
 
 static int luauF_readu8(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
+    if(nparams >= 2 && nresults <= 1 && ttisbuffer(arg0) && ttisnumber(args))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
 
-        if(unsigned(offset) >= unsigned(len))
+        if(unsigned(offset) >= len)
             return -1;
 
         uint8_t val = ((uint8_t*)buf)[offset];
@@ -1365,16 +1365,16 @@ static int luauF_readu8(lua_State* L, StkId res, TValue* arg0, int nresults, Stk
 
 static int luauF_writei8(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 3 && nresults <= 0 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
+    if(nparams >= 3 && nresults <= 0 && ttisbuffer(arg0) && ttisnumber(args) && ttisnumber(args + 1))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
         double n2 = nvalue(args + 1);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
 
-        if(unsigned(offset) >= unsigned(len))
+        if(unsigned(offset) >= len)
             return -1;
 
         ((int8_t*)buf)[offset] = int8_t(n2);
@@ -1386,12 +1386,12 @@ static int luauF_writei8(lua_State* L, StkId res, TValue* arg0, int nresults, St
 
 static int luauF_readi32(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
+    if(nparams >= 2 && nresults <= 1 && ttisbuffer(arg0) && ttisnumber(args))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
         int32_t val;
 
@@ -1408,12 +1408,12 @@ static int luauF_readi32(lua_State* L, StkId res, TValue* arg0, int nresults, St
 
 static int luauF_readu32(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
+    if(nparams >= 2 && nresults <= 1 && ttisbuffer(arg0) && ttisnumber(args))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
         uint32_t val;
 
@@ -1430,13 +1430,13 @@ static int luauF_readu32(lua_State* L, StkId res, TValue* arg0, int nresults, St
 
 static int luauF_writei32(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 3 && nresults <= 0 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
+    if(nparams >= 3 && nresults <= 0 && ttisbuffer(arg0) && ttisnumber(args) && ttisnumber(args + 1))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
         double n2 = nvalue(args + 1);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
         int32_t val = int32_t(n2);
 
@@ -1452,13 +1452,13 @@ static int luauF_writei32(lua_State* L, StkId res, TValue* arg0, int nresults, S
 
 static int luauF_writeu32(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 3 && nresults <= 0 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
+    if(nparams >= 3 && nresults <= 0 && ttisbuffer(arg0) && ttisnumber(args) && ttisnumber(args + 1))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
         double n2 = nvalue(args + 1);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
         uint32_t val = uint32_t((long long)n2);
 
@@ -1474,12 +1474,12 @@ static int luauF_writeu32(lua_State* L, StkId res, TValue* arg0, int nresults, S
 
 static int luauF_readf32(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
+    if(nparams >= 2 && nresults <= 1 && ttisbuffer(arg0) && ttisnumber(args))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
         float val;
 
@@ -1496,13 +1496,13 @@ static int luauF_readf32(lua_State* L, StkId res, TValue* arg0, int nresults, St
 
 static int luauF_writef32(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 3 && nresults <= 0 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
+    if(nparams >= 3 && nresults <= 0 && ttisbuffer(arg0) && ttisnumber(args) && ttisnumber(args + 1))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
         double n2 = nvalue(args + 1);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
         float val = float(n2);
 
@@ -1518,12 +1518,12 @@ static int luauF_writef32(lua_State* L, StkId res, TValue* arg0, int nresults, S
 
 static int luauF_readf64(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 2 && nresults <= 1 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args))
+    if(nparams >= 2 && nresults <= 1 && ttisbuffer(arg0) && ttisnumber(args))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
         double val;
 
@@ -1540,13 +1540,13 @@ static int luauF_readf64(lua_State* L, StkId res, TValue* arg0, int nresults, St
 
 static int luauF_writef64(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
-    if(nparams >= 3 && nresults <= 0 && ttisuserdata(arg0) && uvalue(arg0)->tag == UTAG_BUF && ttisnumber(args) && ttisnumber(args + 1))
+    if(nparams >= 3 && nresults <= 0 && ttisbuffer(arg0) && ttisnumber(args) && ttisnumber(args + 1))
     {
-        void* buf = uvalue(arg0)->data;
+        void* buf = bufvalue(arg0)->data;
         double n1 = nvalue(args);
         double n2 = nvalue(args + 1);
 
-        unsigned len = unsigned(uvalue(arg0)->len);
+        unsigned len = bufvalue(arg0)->len;
         int offset = int(n1);
         double val = n2;
 

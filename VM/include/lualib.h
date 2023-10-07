@@ -43,6 +43,8 @@ LUALIB_API void luaL_checkany(lua_State* L, int narg);
 LUALIB_API int luaL_newmetatable(lua_State* L, const char* tname);
 LUALIB_API void* luaL_checkudata(lua_State* L, int ud, const char* tname);
 
+LUALIB_API void* luaL_checkbuffer(lua_State* L, int narg, unsigned* len);
+
 LUALIB_API void luaL_where(lua_State* L, int lvl);
 LUALIB_API LUA_PRINTF_ATTR(2, 3) l_noret luaL_errorL(lua_State* L, const char* fmt, ...);
 

@@ -11,6 +11,7 @@
 #include "ludata.h"
 #include "lvm.h"
 #include "lnumutils.h"
+#include "lbuffer.h"
 
 #include <string.h>
 
@@ -483,6 +484,8 @@ int lua_objlen(lua_State* L, int idx)
         return tsvalue(o)->len;
     case LUA_TUSERDATA:
         return uvalue(o)->len;
+    case LUA_TBUFFER:
+        return bufvalue(o)->len;
     case LUA_TTABLE:
         return luaH_getn(hvalue(o));
     default:
@@ -533,6 +536,21 @@ lua_State* lua_tothread(lua_State* L, int idx)
     return (!ttisthread(o)) ? NULL : thvalue(o);
 }
 
+void* lua_tobuffer(lua_State* L, int idx, unsigned* len)
+{
+    StkId o = index2addr(L, idx);
+
+    if (!ttisbuffer(o))
+        return NULL;
+
+    Buffer* b = bufvalue(o);
+
+    if (len)
+        *len = b->len;
+
+    return b->data;
+}
+
 const void* lua_topointer(lua_State* L, int idx)
 {
     StkId o = index2addr(L, idx);
@@ -548,6 +566,8 @@ const void* lua_topointer(lua_State* L, int idx)
         return thvalue(o);
     case LUA_TUSERDATA:
         return uvalue(o)->data;
+    case LUA_TBUFFER:
+        return bufvalue(o)->data;
     case LUA_TLIGHTUSERDATA:
         return pvalue(o);
     default:
@@ -1249,13 +1269,23 @@ void lua_concat(lua_State* L, int n)
 
 void* lua_newuserdatatagged(lua_State* L, size_t sz, int tag)
 {
-    api_check(L, unsigned(tag) < LUA_UTAG_LIMIT || tag == UTAG_PROXY || tag == UTAG_BUF);
+    api_check(L, unsigned(tag) < LUA_UTAG_LIMIT || tag == UTAG_PROXY);
     luaC_checkGC(L);
     luaC_threadbarrier(L);
     Udata* u = luaU_newudata(L, sz, tag);
     setuvalue(L, L->top, u);
     api_incr_top(L);
     return u->data;
+}
+
+void* lua_newbuffer(lua_State* L, size_t sz)
+{
+    luaC_checkGC(L);
+    luaC_threadbarrier(L);
+    Buffer* b = luaB_newbuffer(L, sz);
+    setbufvalue(L, L->top, b);
+    api_incr_top(L);
+    return b->data;
 }
 
 void* lua_newuserdatadtor(lua_State* L, size_t sz, void (*dtor)(void*))

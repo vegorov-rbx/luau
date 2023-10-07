@@ -9,6 +9,7 @@
 #include "lstring.h"
 #include "ltable.h"
 #include "ludata.h"
+#include "lbuffer.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -160,6 +161,9 @@ static void validateobj(global_State* g, GCObject* o)
     case LUA_TUSERDATA:
         if (gco2u(o)->metatable)
             validateobjref(g, o, obj2gco(gco2u(o)->metatable));
+        break;
+
+    case LUA_TBUFFER:
         break;
 
     case LUA_TTHREAD:
@@ -387,6 +391,11 @@ static void dumpudata(FILE* f, Udata* u)
     fprintf(f, "}");
 }
 
+static void dumpbuffer(FILE* f, Buffer* b)
+{
+    fprintf(f, "{\"type\":\"buffer\",\"cat\":%d,\"size\":%d}", b->memcat, int(sizebuffer(b->len)));
+}
+
 static void dumpthread(FILE* f, lua_State* th)
 {
     size_t size = sizeof(lua_State) + sizeof(TValue) * th->stacksize + sizeof(CallInfo) * th->size_ci;
@@ -538,6 +547,9 @@ static void dumpobj(FILE* f, GCObject* o)
     case LUA_TUSERDATA:
         return dumpudata(f, gco2u(o));
 
+    case LUA_TBUFFER:
+        return dumpbuffer(f, gco2buf(o));
+
     case LUA_TTHREAD:
         return dumpthread(f, gco2th(o));
 
@@ -613,8 +625,8 @@ struct EnumContext
 
 static void* enumtopointer(GCObject* gco)
 {
-    // To match lua_topointer, userdata pointer is represented as a pointer to internal data
-    return gco->gch.tt == LUA_TUSERDATA ? (void*)gco2u(gco)->data : (void*)gco;
+    // To match lua_topointer, userdata and buffer pointers is represented as a pointer to internal data
+    return gco->gch.tt == LUA_TUSERDATA ? (void*)gco2u(gco)->data : (gco->gch.tt == LUA_TBUFFER ? (void*)gco2buf(gco)->data : (void*)gco);
 }
 
 static void enumnode(EnumContext* ctx, GCObject* gco, const char* objname)
@@ -743,6 +755,11 @@ static void enumudata(EnumContext* ctx, Udata* u)
         enumedge(ctx, obj2gco(u), obj2gco(u->metatable), "metatable");
 }
 
+static void enumbuffer(EnumContext* ctx, Buffer* b)
+{
+    enumnode(ctx, obj2gco(b), NULL);
+}
+
 static void enumthread(EnumContext* ctx, lua_State* th)
 {
     Closure* tcl = NULL;
@@ -813,6 +830,9 @@ static void enumobj(EnumContext* ctx, GCObject* o)
 
     case LUA_TUSERDATA:
         return enumudata(ctx, gco2u(o));
+
+    case LUA_TBUFFER:
+        return enumbuffer(ctx, gco2buf(o));
 
     case LUA_TTHREAD:
         return enumthread(ctx, gco2th(o));

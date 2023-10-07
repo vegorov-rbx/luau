@@ -1351,13 +1351,7 @@ void IrLoweringA64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
         finalizeTargetLabel(inst.b, fresh);
         break;
     }
-    case IrCmd::CHECK_UDATA_TAG:
-    {
-        // TODO: find the time
-        error = true;
-        break;
-    }
-    case IrCmd::CHECK_UDATA_LEN:
+    case IrCmd::CHECK_BUFFER_LEN:
     {
         // TODO: find the time
         error = true;
@@ -1983,15 +1977,15 @@ void IrLoweringA64::lowerInst(IrInst& inst, uint32_t index, const IrBlock& next)
     }
 
     // TODO: find the time
-    case IrCmd::UDATA_READI8:
-    case IrCmd::UDATA_READU8:
-    case IrCmd::UDATA_WRITEI8:
-    case IrCmd::UDATA_READI32:
-    case IrCmd::UDATA_WRITEI32:
-    case IrCmd::UDATA_READF32:
-    case IrCmd::UDATA_WRITEF32:
-    case IrCmd::UDATA_READF64:
-    case IrCmd::UDATA_WRITEF64:
+    case IrCmd::BUFFER_READI8:
+    case IrCmd::BUFFER_READU8:
+    case IrCmd::BUFFER_WRITEI8:
+    case IrCmd::BUFFER_READI32:
+    case IrCmd::BUFFER_WRITEI32:
+    case IrCmd::BUFFER_READF32:
+    case IrCmd::BUFFER_WRITEF32:
+    case IrCmd::BUFFER_READF64:
+    case IrCmd::BUFFER_WRITEF64:
         error = true;
         break;
 

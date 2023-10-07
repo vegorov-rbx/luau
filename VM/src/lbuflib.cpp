@@ -2,14 +2,9 @@
 #include "lualib.h"
 
 #include "lcommon.h"
-#include "lmem.h"
-#include "lstring.h"
-#include "ludata.h"
+#include "lbuffer.h"
 
 #include <string.h>
-
-// Limit similar to the one we have for strings
-#define MAX_BUFFER_SIZE MAXSSIZE
 
 #define isoutofbounds(offset, len, accessize) ((len) < (accessize) || unsigned(offset) > (len) - (accessize))
 
@@ -21,10 +16,7 @@ static int buffer_create(lua_State* L)
     if (double(size) != dsize || size < 0)
         luaL_error(L, "invalid buffer size");
 
-    if (size > MAX_BUFFER_SIZE)
-        luaM_toobig(L);
-
-    void* buf = lua_newuserdatatagged(L, size, UTAG_BUF);
+    void* buf = lua_newbuffer(L, size);
     memset(buf, 0, size);
 
     return 1;
@@ -32,11 +24,8 @@ static int buffer_create(lua_State* L)
 
 static int buffer_readi8(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
 
     if (unsigned(offset) >= len)
@@ -49,11 +38,8 @@ static int buffer_readi8(lua_State* L)
 
 static int buffer_readu8(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
 
     if (unsigned(offset) >= len)
@@ -66,11 +52,8 @@ static int buffer_readu8(lua_State* L)
 
 static int buffer_writei8(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
     int value = luaL_checkinteger(L, 3);
 
@@ -83,11 +66,8 @@ static int buffer_writei8(lua_State* L)
 
 static int buffer_readi16(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
 
     int16_t val;
@@ -102,11 +82,8 @@ static int buffer_readi16(lua_State* L)
 
 static int buffer_readu16(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
 
     uint16_t val;
@@ -121,11 +98,8 @@ static int buffer_readu16(lua_State* L)
 
 static int buffer_writei16(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
     int value = luaL_checkinteger(L, 3);
 
@@ -140,11 +114,8 @@ static int buffer_writei16(lua_State* L)
 
 static int buffer_readi32(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
 
     int32_t val;
@@ -159,11 +130,8 @@ static int buffer_readi32(lua_State* L)
 
 static int buffer_readu32(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
 
     uint32_t val;
@@ -178,11 +146,8 @@ static int buffer_readu32(lua_State* L)
 
 static int buffer_writei32(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
     int val = luaL_checkinteger(L, 3);
 
@@ -195,11 +160,8 @@ static int buffer_writei32(lua_State* L)
 
 static int buffer_writeu32(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
     unsigned val = luaL_checkunsigned(L, 3);
 
@@ -212,11 +174,8 @@ static int buffer_writeu32(lua_State* L)
 
 static int buffer_readf32(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
 
     float val;
@@ -231,11 +190,8 @@ static int buffer_readf32(lua_State* L)
 
 static int buffer_writef32(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
     double value = luaL_checknumber(L, 3);
 
@@ -250,11 +206,8 @@ static int buffer_writef32(lua_State* L)
 
 static int buffer_readf64(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
 
     double val;
@@ -269,11 +222,8 @@ static int buffer_readf64(lua_State* L)
 
 static int buffer_writef64(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
     double val = luaL_checknumber(L, 3);
 
@@ -286,11 +236,8 @@ static int buffer_writef64(lua_State* L)
 
 static int buffer_readstring(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
     int size = luaL_checkinteger(L, 3);
 
@@ -306,11 +253,8 @@ static int buffer_readstring(lua_State* L)
 
 static int buffer_writestring(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
-
-    unsigned len = lua_objlen(L, 1);
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
     int offset = luaL_checkinteger(L, 2);
     size_t size = 0;
     const char* val = luaL_checklstring(L, 3, &size);
@@ -324,30 +268,25 @@ static int buffer_writestring(lua_State* L)
 
 static int buffer_len(lua_State* L)
 {
-    void* buf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!buf)
-        luaL_typeerrorL(L, 1, "buffer");
+    unsigned len = 0;
+    void* buf = luaL_checkbuffer(L, 1, &len);
 
-    lua_pushnumber(L, double(lua_objlen(L, 1)));
+    lua_pushnumber(L, double(len));
     return 1;
 }
 
 static int buffer_copy(lua_State* L)
 {
-    void* sbuf = lua_touserdatatagged(L, 1, UTAG_BUF);
-    if (!sbuf)
-        luaL_typeerrorL(L, 1, "buffer");
-    unsigned slen = lua_objlen(L, 1);
-
+    unsigned slen = 0;
+    void* sbuf = luaL_checkbuffer(L, 1, &slen);
     int soffset = luaL_checkinteger(L, 2);
     int size = luaL_checkinteger(L, 3);
     int toffset = luaL_checkinteger(L, 4);
+
     int tu = !lua_isnoneornil(L, 5) ? 5 : 1; // destination userdata
 
-    void* tbuf = lua_touserdatatagged(L, tu, UTAG_BUF);
-    if (!tbuf)
-        luaL_typeerrorL(L, tu, "buffer");
-    unsigned tlen = lua_objlen(L, tu);
+    unsigned tlen = 0;
+    void* tbuf = luaL_checkbuffer(L, tu, &tlen);
 
     if (size < 0)
         luaL_error(L, "size cannot be negative");

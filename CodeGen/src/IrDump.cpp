@@ -231,10 +231,8 @@ const char* getCmdName(IrCmd cmd)
         return "CHECK_NODE_NO_NEXT";
     case IrCmd::CHECK_NODE_VALUE:
         return "CHECK_NODE_VALUE";
-    case IrCmd::CHECK_UDATA_TAG:
-        return "CHECK_UDATA_TAG";
-    case IrCmd::CHECK_UDATA_LEN:
-        return "CHECK_UDATA_LEN";
+    case IrCmd::CHECK_BUFFER_LEN:
+        return "CHECK_BUFFER_LEN";
     case IrCmd::INTERRUPT:
         return "INTERRUPT";
     case IrCmd::CHECK_GC:
@@ -317,24 +315,24 @@ const char* getCmdName(IrCmd cmd)
         return "GET_TYPEOF";
     case IrCmd::FINDUPVAL:
         return "FINDUPVAL";
-    case IrCmd::UDATA_READI8:
-        return "UDATA_READI8";
-    case IrCmd::UDATA_READU8:
-        return "UDATA_READU8";
-    case IrCmd::UDATA_WRITEI8:
-        return "UDATA_WRITEI8";
-    case IrCmd::UDATA_READI32:
-        return "UDATA_READI32";
-    case IrCmd::UDATA_WRITEI32:
-        return "UDATA_WRITEI32";
-    case IrCmd::UDATA_READF32:
-        return "UDATA_READF32";
-    case IrCmd::UDATA_WRITEF32:
-        return "UDATA_WRITEF32";
-    case IrCmd::UDATA_READF64:
-        return "UDATA_READF64";
-    case IrCmd::UDATA_WRITEF64:
-        return "UDATA_WRITEF64";
+    case IrCmd::BUFFER_READI8:
+        return "BUFFER_READI8";
+    case IrCmd::BUFFER_READU8:
+        return "BUFFER_READU8";
+    case IrCmd::BUFFER_WRITEI8:
+        return "BUFFER_WRITEI8";
+    case IrCmd::BUFFER_READI32:
+        return "BUFFER_READI32";
+    case IrCmd::BUFFER_WRITEI32:
+        return "BUFFER_WRITEI32";
+    case IrCmd::BUFFER_READF32:
+        return "BUFFER_READF32";
+    case IrCmd::BUFFER_WRITEF32:
+        return "BUFFER_WRITEF32";
+    case IrCmd::BUFFER_READF64:
+        return "BUFFER_READF64";
+    case IrCmd::BUFFER_WRITEF64:
+        return "BUFFER_WRITEF64";
     }
 
     LUAU_UNREACHABLE();

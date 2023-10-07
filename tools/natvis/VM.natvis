@@ -11,6 +11,7 @@
     <DisplayString Condition="tt == lua_Type::LUA_TTABLE">{value.gc->h}</DisplayString>
     <DisplayString Condition="tt == lua_Type::LUA_TFUNCTION">function {value.gc->cl,view(short)}</DisplayString>
     <DisplayString Condition="tt == lua_Type::LUA_TUSERDATA">userdata {value.gc->u}</DisplayString>
+    <DisplayString Condition="tt == lua_Type::LUA_TBUFFER">buffer {value.gc->buf} size={value.gc->buf.len}</DisplayString>
     <DisplayString Condition="tt == lua_Type::LUA_TTHREAD">thread {value.gc->th}</DisplayString>
     <DisplayString Condition="tt == lua_Type::LUA_TPROTO">proto {value.gc->p}</DisplayString>
     <DisplayString Condition="tt == lua_Type::LUA_TUPVAL">upvalue {value.gc->uv}</DisplayString>
@@ -23,6 +24,7 @@
       <Item Name="[C function]" Condition="tt == lua_Type::LUA_TFUNCTION &amp;&amp; value.gc-&gt;cl.isC">value.gc->cl</Item>
       <Item Name="[Lua function]" Condition="tt == lua_Type::LUA_TFUNCTION &amp;&amp; !value.gc-&gt;cl.isC">value.gc->cl</Item>
       <Item Name="[userdata]" Condition="tt == lua_Type::LUA_TUSERDATA">value.gc->u</Item>
+      <Item Name="[buffer]" Condition="tt == lua_Type::LUA_TBUFFER">value.gc->buf</Item>
       <Item Name="[thread]" Condition="tt == lua_Type::LUA_TTHREAD">value.gc->th</Item>
       <Item Name="[proto]" Condition="tt == lua_Type::LUA_TPROTO">value.gc->p</Item>
       <Item Name="[upvalue]" Condition="tt == lua_Type::LUA_TUPVAL">value.gc->uv</Item>
@@ -46,6 +48,7 @@
     <DisplayString Condition="tt == lua_Type::LUA_TTABLE">{value.gc->h}</DisplayString>
     <DisplayString Condition="tt == lua_Type::LUA_TFUNCTION">function {value.gc->cl,view(short)}</DisplayString>
     <DisplayString Condition="tt == lua_Type::LUA_TUSERDATA">userdata {value.gc->u}</DisplayString>
+    <DisplayString Condition="tt == lua_Type::LUA_TBUFFER">buffer {value.gc->buf} size={value.gc->buf.len}</DisplayString>
     <DisplayString Condition="tt == lua_Type::LUA_TTHREAD">thread {value.gc->th}</DisplayString>
     <DisplayString Condition="tt == lua_Type::LUA_TPROTO">proto {value.gc->p}</DisplayString>
     <DisplayString Condition="tt == lua_Type::LUA_TUPVAL">upvalue {value.gc->uv}</DisplayString>
@@ -58,6 +61,7 @@
       <Item Name="[C function]" Condition="tt == lua_Type::LUA_TFUNCTION &amp;&amp; value.gc-&gt;cl.isC">value.gc->cl</Item>
       <Item Name="[Lua function]" Condition="tt == lua_Type::LUA_TFUNCTION &amp;&amp; !value.gc-&gt;cl.isC">value.gc->cl</Item>
       <Item Name="[userdata]" Condition="tt == lua_Type::LUA_TUSERDATA">value.gc->u</Item>
+      <Item Name="[buffer]" Condition="tt == lua_Type::LUA_TBUFFER">value.gc->buf</Item>
       <Item Name="[thread]" Condition="tt == lua_Type::LUA_TTHREAD">value.gc->th</Item>
       <Item Name="[proto]" Condition="tt == lua_Type::LUA_TPROTO">value.gc->p</Item>
       <Item Name="[upvalue]" Condition="tt == lua_Type::LUA_TUPVAL">value.gc->uv</Item>

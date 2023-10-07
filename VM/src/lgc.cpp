@@ -10,6 +10,7 @@
 #include "ldo.h"
 #include "lmem.h"
 #include "ludata.h"
+#include "lbuffer.h"
 
 #include <string.h>
 
@@ -247,6 +248,11 @@ static void reallymarkobject(global_State* g, GCObject* o)
         gray2black(o); // udata are never gray
         if (mt)
             markobject(g, mt);
+        return;
+    }
+    case LUA_TBUFFER:
+    {
+        gray2black(o); // buffers are never gray
         return;
     }
     case LUA_TUPVAL:
@@ -617,6 +623,9 @@ static void freeobj(lua_State* L, GCObject* o, lua_Page* page)
         break;
     case LUA_TUSERDATA:
         luaU_freeudata(L, gco2u(o), page);
+        break;
+    case LUA_TBUFFER:
+        luaB_freebuffer(L, gco2buf(o), page);
         break;
     default:
         LUAU_ASSERT(0);

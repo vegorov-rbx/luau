@@ -277,6 +277,7 @@ union GCObject
     GCheader gch;
     struct TString ts;
     struct Udata u;
+    struct Buffer buf;
     struct Closure cl;
     struct Table h;
     struct Proto p;
@@ -287,6 +288,7 @@ union GCObject
 // macros to convert a GCObject into a specific value
 #define gco2ts(o) check_exp((o)->gch.tt == LUA_TSTRING, &((o)->ts))
 #define gco2u(o) check_exp((o)->gch.tt == LUA_TUSERDATA, &((o)->u))
+#define gco2buf(o) check_exp((o)->gch.tt == LUA_TBUFFER, &((o)->buf))
 #define gco2cl(o) check_exp((o)->gch.tt == LUA_TFUNCTION, &((o)->cl))
 #define gco2h(o) check_exp((o)->gch.tt == LUA_TTABLE, &((o)->h))
 #define gco2p(o) check_exp((o)->gch.tt == LUA_TPROTO, &((o)->p))

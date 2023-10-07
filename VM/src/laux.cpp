@@ -132,6 +132,14 @@ void* luaL_checkudata(lua_State* L, int ud, const char* tname)
     luaL_typeerrorL(L, ud, tname); // else error
 }
 
+void* luaL_checkbuffer(lua_State* L, int narg, unsigned* len)
+{
+    void* b = lua_tobuffer(L, narg, len);
+    if (!b)
+        tag_error(L, narg, LUA_TBUFFER);
+    return b;
+}
+
 void luaL_checkstack(lua_State* L, int space, const char* mes)
 {
     if (!lua_checkstack(L, space))

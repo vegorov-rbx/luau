@@ -861,34 +861,18 @@ static void constPropInInst(ConstPropState& state, IrBuilder& build, IrFunction&
             state.inSafeEnv = true;
         }
         break;
-    case IrCmd::CHECK_UDATA_TAG:
-        if(RegisterInfo* info = state.tryGetRegisterInfo(inst.a))
-        {
-            if(info->knownUdataTag == function.intOp(inst.b))
-            {
-                if(FFlag::DebugLuauAbortingChecks)
-                    replace(function, inst.b, build.undef());
-                else
-                    kill(function, inst);
-            }
-            else
-            {
-                info->knownUdataTag = function.intOp(inst.b);
-            }
-        }
-        break;
-    case IrCmd::CHECK_UDATA_LEN:
+    case IrCmd::CHECK_BUFFER_LEN:
         // TODO: remove duplicate checks and update tracked userdata length when possible
         break;
-    case IrCmd::UDATA_READI8:
-    case IrCmd::UDATA_READU8:
-    case IrCmd::UDATA_WRITEI8:
-    case IrCmd::UDATA_READI32:
-    case IrCmd::UDATA_WRITEI32:
-    case IrCmd::UDATA_READF32:
-    case IrCmd::UDATA_WRITEF32:
-    case IrCmd::UDATA_READF64:
-    case IrCmd::UDATA_WRITEF64:
+    case IrCmd::BUFFER_READI8:
+    case IrCmd::BUFFER_READU8:
+    case IrCmd::BUFFER_WRITEI8:
+    case IrCmd::BUFFER_READI32:
+    case IrCmd::BUFFER_WRITEI32:
+    case IrCmd::BUFFER_READF32:
+    case IrCmd::BUFFER_WRITEF32:
+    case IrCmd::BUFFER_READF64:
+    case IrCmd::BUFFER_WRITEF64:
         break;
     case IrCmd::CHECK_GC:
         // It is enough to perform a GC check once in a block
