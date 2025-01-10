@@ -7,7 +7,6 @@
 #include <math.h>
 #include <time.h>
 
-LUAU_FASTFLAGVARIABLE(LuauMathMap)
 LUAU_FASTFLAGVARIABLE(LuauMathLerp)
 
 #undef PI
@@ -463,6 +462,7 @@ static const luaL_Reg mathlib[] = {
     {"clamp", math_clamp},
     {"sign", math_sign},
     {"round", math_round},
+    {"map", math_map},
     {NULL, NULL},
 };
 
@@ -483,10 +483,10 @@ int luaopen_math(lua_State* L)
     lua_pushnumber(L, HUGE_VAL);
     lua_setfield(L, -2, "huge");
 
-    if (FFlag::LuauMathMap)
+    if (FFlag::LuauMathLerp)
     {
-        lua_pushcfunction(L, math_map, "map");
-        lua_setfield(L, -2, "map");
+        lua_pushcfunction(L, math_lerp, "lerp");
+        lua_setfield(L, -2, "lerp");
     }
 
     if (FFlag::LuauMathLerp)
